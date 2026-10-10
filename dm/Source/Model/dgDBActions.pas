@@ -588,6 +588,10 @@ function ActionRelatesToTable(AAction: TatDBAction; const ATableName: string): b
 {True for actions that drop a whole object (table, field, index, relationship, ...)}
 function IsRemoveAction(AAction: TatDBAction): boolean;
 
+{The relationship of ADictionary matching ARelationship: same name and same child table.
+ Unnamed foreign keys (SQLite) also need the same parent table and child fields}
+function MatchRelationship(ADictionary: TGDAODatabase; ARelationship: TGDAORelationship): TGDAORelationship;
+
 const
   txt_ChangeProcedure   = 'Stored procedure %s change';
   txt_ChangeDomain      = 'Domain %s change';
@@ -674,12 +678,52 @@ begin
     result := table.Fields.FindbyName(AField.FieldName);
 end;
 
+function MatchRelationship(ADictionary: TGDAODatabase; ARelationship: TGDAORelationship): TGDAORelationship;
+
+  function TableNameOf(ATable: TGDAOTable): string;
+  begin
+    if ATable <> nil then
+      Result := ATable.TableName
+    else
+      Result := '';
+  end;
+
+  function ChildFieldNames(ARel: TGDAORelationship): string;
+  var
+    i: integer;
+  begin
+    Result := '';
+    for i := 0 to ARel.FieldLinks.Count - 1 do
+      if ARel.FieldLinks[i].ChildField <> nil then
+        Result := Result + LowerCase(ARel.FieldLinks[i].ChildField.FieldName) + ',';
+  end;
+
+var
+  i: integer;
+  rel: TGDAORelationship;
+begin
+  result := nil;
+  if ARelationship = nil then
+    Exit;
+  for i := 0 to ADictionary.Relationships.Count - 1 do
+  begin
+    rel := ADictionary.Relationships[i];
+    if (CompareText(rel.RelationshipName, ARelationship.RelationshipName) <> 0)
+      or (CompareText(TableNameOf(rel.ChildTable), TableNameOf(ARelationship.ChildTable)) <> 0) then
+      Continue;
+    // unnamed foreign keys (SQLite): also the parent table and the linked child fields
+    if (ARelationship.RelationshipName = '')
+      and ((CompareText(TableNameOf(rel.ParentTable), TableNameOf(ARelationship.ParentTable)) <> 0)
+        or (ChildFieldNames(rel) <> ChildFieldNames(ARelationship))) then
+      Continue;
+    Exit(rel);
+  end;
+end;
+
 function FindDictionaryRelationship(ADictionary: TGDAODatabase; ARelationship: TGDAORelationship): TGDAORelationship;
 begin
-  if ARelationship <> nil then
-    result := ADictionary.RelationshipByName(ARelationship.RelationshipName)
-  else
-    result := nil;
+  // name + child table: PostgreSQL allows the same foreign key name on different tables
+  result := MatchRelationship(ADictionary, ARelationship);
 end;
 
 { In the database a foreign key column exists independently of the foreign key.

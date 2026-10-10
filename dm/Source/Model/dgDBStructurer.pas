@@ -151,6 +151,7 @@ type
     FExcludedTables: TStrings;
     FCategories: TGDAOCategoryTypes;
     FIncludeViewTables: boolean;
+    FResyncMode: boolean;
 
     {IsTableIncluded is different than MustInclude(Table). This function
     only checks for the excluded tables list, and ignores if the filter items
@@ -183,6 +184,10 @@ type
     {Default false: Update Database / Generate Script never see view-backed tables.
     Resync sets it to true so view columns are compared}
     property IncludeViewTables: boolean read FIncludeViewTables write FIncludeViewTables;
+    {Resync (model <- live database): tolerate what retrievers do not read back exactly.
+    Comments missing on the database side are ignored, primary keys compare by fields
+    (not by system-generated names), type names and object source text compare loosely}
+    property ResyncMode: boolean read FResyncMode write FResyncMode;
   end;
 
   {$IFNDEF DATAMODELER}
@@ -466,6 +471,7 @@ begin
     FItems := TSQLScriptFilter(ASource).FItems;
     FCategories := TSQLScriptFilter(ASource).FCategories;
     FIncludeViewTables := TSQLScriptFilter(ASource).FIncludeViewTables;
+    FResyncMode := TSQLScriptFilter(ASource).FResyncMode;
     FExcludedTables.Assign(TSQLScriptFilter(ASource).FExcludedTables);
   end else
     inherited Assign(ASource);

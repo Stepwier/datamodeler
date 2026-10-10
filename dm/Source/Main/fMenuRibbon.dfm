@@ -1,13 +1,13 @@
 object fmMenuRibbon: TfmMenuRibbon
   Left = 250
   Top = 200
-  ClientHeight = 573
+  ClientHeight = 497
   ClientWidth = 944
   Color = clBtnFace
   Constraints.MinWidth = 960
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -9
+  Font.Height = -6
   Font.Name = 'Tahoma'
   Font.Style = []
   Icon.Data = {
@@ -13490,10 +13490,10 @@ object fmMenuRibbon: TfmMenuRibbon
   OnCreate = FormCreate
   OnShow = FormShow
   object gdipicon: TAdvGDIPPicture
-    Left = -13
-    Top = -13
-    Width = 13
-    Height = 13
+    Left = -10
+    Top = -10
+    Width = 10
+    Height = 10
     Margins.Left = 2
     Margins.Top = 2
     Margins.Right = 2
@@ -13529,7 +13529,7 @@ object fmMenuRibbon: TfmMenuRibbon
     Left = 0
     Top = 0
     Width = 944
-    Height = 119
+    Height = 121
     Margins.Left = 2
     Margins.Top = 2
     Margins.Right = 2
@@ -13718,7 +13718,7 @@ object fmMenuRibbon: TfmMenuRibbon
       Left = -1
       Top = 60
       Width = 946
-      Height = 59
+      Height = 61
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2
@@ -13727,8 +13727,8 @@ object fmMenuRibbon: TfmMenuRibbon
       object AdvToolBar1: TAdvToolBar
         Left = 3
         Top = 3
-        Width = 193
-        Height = 53
+        Width = 185
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -13754,8 +13754,8 @@ object fmMenuRibbon: TfmMenuRibbon
         object btGenerate: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 42
-          Height = 54
+          Width = 34
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -13976,7 +13976,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btCheck: TAdvGlowButton
-          Left = 44
+          Left = 36
           Top = 2
           Width = 47
           Height = 67
@@ -14151,7 +14151,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btProjectMerge: TAdvGlowButton
-          Left = 91
+          Left = 83
           Top = 2
           Width = 49
           Height = 67
@@ -14315,7 +14315,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btProjectResync: TAdvGlowButton
-          Left = 140
+          Left = 132
           Top = 2
           Width = 49
           Height = 67
@@ -14330,6 +14330,51 @@ object fmMenuRibbon: TfmMenuRibbon
           Font.Name = 'Segoe UI'
           Font.Style = []
           ImageIndex = 0
+          DisabledPicture.Data = {
+            89504E470D0A1A0A0000000D4948445200000020000000200806000000737A7A
+            F4000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+            00097048597300000EC100000EC101B8916BED0000001874455874536F667477
+            617265005061696E742E4E455420352E312E378BD6F739000000B66558496649
+            492A000800000005001A010500010000004A0000001B01050001000000520000
+            0028010300010000000200000031010200100000005A00000069870400010000
+            006A00000000000000D9760100E8030000D9760100E80300005061696E742E4E
+            455420352E312E3700030000900700040000003032333001A003000100000001
+            00000005A0040001000000940000000000000002000100020004000000523938
+            00020007000400000030313030000000006BBAD61B92FB185300000412494441
+            545847C5D75B8857551406F0DF7F6C521CCB4BE3431751473345988822A4B2C0
+            084D88A85E94B0B020D01E2A222ABA424141F4E0437679C887A4142292D032BA
+            796932044BA31C2FA9F94F4426B3ABCE983ABD7C474E47E7A2642D389CB3D75E
+            7BEFB5F7FAD6B7F6A9D5EB75A728E7A005A3303CBA5FB01B3BF15BC5BE57A9F5
+            D38146CCC46C5C850B30A062730C7BD086B7F03E0E576C4E90FE38701B9EC0A5
+            D58E3E64139EC1DBD58EB2F4E6C0702CC4AC8AFE20BEC316744437129760129A
+            2AF64B301F072A7A7A71600C96A1B5A4DB8697A3DF51D297A50537631E2E2EE9
+            3745BFABA4A30707CEC7279898F6513C8B17F067C5B62769C24378BC8495764C
+            C3DEB261D58101F8308682EE595859363A05999E100C4BFBE3E88E160655071E
+            C173F93E18E3B5189113198F8BD08C21383BB687F1077EC28FF81E9BF133AEC9
+            0606C7F6513C9FEF7F38301A1B3134EDBBB0080B927E230BC37E4A47D2F13ECC
+            C5EBD1FF9A8CFA011A4A03E697165F91C58760EA692C2E63A6668E459953D698
+            571815273004DF04FD32706D8CAF4BFF248C0B090DC3209C15FB233814CCEC4D
+            08DAC38AABB3EB2BF14536BD2BF375160E4CC707996C032ECFF7787C9D011BF3
+            DE93C58EA016E0D68287A6F0C7D81CF398BC77E4BD247C2161692B1C98827B32
+            D17B78274663B0BD944ADBF1404EE1D5C4B123FD0D3991C9B115B48FCD09ACC7
+            84521FACAE6641551AE2D8FDF17C55503C081F6131D695B26140326964C2B000
+            2FA54E5C91142F0AD8764CEBCB8151B8176BB2487368B815B7A43236A02BF1DE
+            87AD59BC2B856B218A45A6C589FDC1567B5F0EB4C4D35A4AEDCEE4F6BE80ADC0
+            416380DA8C0B43C32DE80E8ECAD43D3373AC53E18129380FCB4BC6E3F02D06A6
+            BD37156E341E4E8C0F55D2B9201C3985C93991934A3170628ACCB2120D4B5AED
+            2CB5BFC29701E9C1C4F876DC99676EA5E0ECCE1C3D4AAD5EAF8F0A4717D5EB40
+            D2727DC0D68A6B737443B13468BEBB3257373AB3E0D6D0EF6749EBAE8AED71A9
+            D5EBF55559A02C5B83DA667C1A32694BEC060590DD79D78285CE3CDD09E59400
+            ED86E0086EC54DB1790DEB6AF57A7D42D0BA28465B52013786073697302045E7
+            F7E4F69184B13124746EC058485718AF08E3065C96EF1958D990DD2E298A4342
+            51ECB0562E9DB1BD2377838941FCE0D81F0E2995EF8147338754C562F15DF85C
+            09849D71A2D03D95EF6395DD6FCB6EDA02C2C5C986C7F23C19AA2E6460E61002
+            2B64694EB25FE5F845CC09BB75E2CD50F18CE3D39D5C3AF0061EECAD1C5789A8
+            AF0BC98410CB88F07E41C17F0517FBC37AA77521112E5F89EBD33EE357B23283
+            49C79CD47219B81C4F9FE4BADD9B3465CCF2D2E2ED99BB0CEA134EA0909EAEE5
+            AFE0DD337D2D2F64784AE9EC8AFE3FF93129CBFFF66B569646DC98D3B8BA9F3F
+            A72B921DBD4A7F1D28CBBFFA7BFE37FF1561B6338166000000000049454E44AE
+            426082}
           FocusType = ftHot
           NotesFont.Charset = DEFAULT_CHARSET
           NotesFont.Color = clWindowText
@@ -14411,10 +14456,10 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object AdvToolBar3: TAdvToolBar
-        Left = 473
+        Left = 465
         Top = 3
-        Width = 132
-        Height = 53
+        Width = 116
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -14438,10 +14483,10 @@ object fmMenuRibbon: TfmMenuRibbon
         ParentOptionPicture = True
         ToolBarIndex = 2
         object btVersionArchive: TAdvGlowButton
-          Left = 43
+          Left = 35
           Top = 2
-          Width = 38
-          Height = 54
+          Width = 30
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -14610,8 +14655,8 @@ object fmMenuRibbon: TfmMenuRibbon
         object btVersionCompare: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 41
-          Height = 54
+          Width = 33
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -14751,7 +14796,7 @@ object fmMenuRibbon: TfmMenuRibbon
           DropDownPosition = dpBottom
         end
         object btVersionManage: TAdvGlowButton
-          Left = 81
+          Left = 65
           Top = 2
           Width = 47
           Height = 67
@@ -14911,10 +14956,10 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object AdvToolBar4: TAdvToolBar
-        Left = 199
+        Left = 191
         Top = 3
         Width = 271
-        Height = 53
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -14940,10 +14985,10 @@ object fmMenuRibbon: TfmMenuRibbon
         ParentOptionPicture = True
         ToolBarIndex = 1
         object btNewProcedure: TAdvGlowButton
-          Left = 98
+          Left = 78
           Top = 2
-          Width = 72
-          Height = 18
+          Width = 58
+          Height = 14
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -15028,8 +15073,8 @@ object fmMenuRibbon: TfmMenuRibbon
         object btNewTable: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 38
-          Height = 54
+          Width = 30
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -15129,10 +15174,10 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btNewRelationship: TAdvGlowButton
-          Left = 39
+          Left = 31
           Top = 2
-          Width = 59
-          Height = 54
+          Width = 47
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -15228,10 +15273,10 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btNewObject: TAdvGlowButton
-          Left = 98
-          Top = 37
-          Width = 72
-          Height = 18
+          Left = 78
+          Top = 30
+          Width = 58
+          Height = 14
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -15325,10 +15370,10 @@ object fmMenuRibbon: TfmMenuRibbon
           DropDownMenu = pmObjects
         end
         object btNewView: TAdvGlowButton
-          Left = 98
-          Top = 19
-          Width = 72
-          Height = 18
+          Left = 78
+          Top = 15
+          Width = 58
+          Height = 14
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -15413,10 +15458,10 @@ object fmMenuRibbon: TfmMenuRibbon
           MaxButtonSizeState = bsLabel
         end
         object btProjectDomains: TAdvGlowButton
-          Left = 172
+          Left = 138
           Top = 2
-          Width = 42
-          Height = 54
+          Width = 34
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -15571,10 +15616,10 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object AdvToolBar5: TAdvToolBar
-        Left = 608
+        Left = 584
         Top = 3
         Width = 126
-        Height = 53
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -15599,9 +15644,9 @@ object fmMenuRibbon: TfmMenuRibbon
         ToolBarIndex = 3
         object btViewMessages: TAdvGlowButton
           Left = 2
-          Top = 24
-          Width = 96
-          Height = 18
+          Top = 2
+          Width = 77
+          Height = 14
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -15693,7 +15738,7 @@ object fmMenuRibbon: TfmMenuRibbon
         end
         object btViewExplorer: TAdvGlowButton
           Left = 2
-          Top = 2
+          Top = 16
           Width = 120
           Height = 22
           Margins.Left = 2
@@ -15795,17 +15840,17 @@ object fmMenuRibbon: TfmMenuRibbon
       Left = -1
       Top = 60
       Width = 946
-      Height = 59
+      Height = 61
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2
       Margins.Bottom = 2
       Caption = 'Tools'
       object AdvToolBar7: TAdvToolBar
-        Left = 211
+        Left = 192
         Top = 3
-        Width = 121
-        Height = 53
+        Width = 110
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -15831,8 +15876,8 @@ object fmMenuRibbon: TfmMenuRibbon
         object btToolsConnections: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 53
-          Height = 54
+          Width = 42
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -15970,7 +16015,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btToolsConversionMaps: TAdvGlowButton
-          Left = 55
+          Left = 44
           Top = 2
           Width = 62
           Height = 67
@@ -16137,8 +16182,8 @@ object fmMenuRibbon: TfmMenuRibbon
       object AdvToolBar8: TAdvToolBar
         Left = 3
         Top = 3
-        Width = 143
-        Height = 53
+        Width = 135
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -16164,8 +16209,8 @@ object fmMenuRibbon: TfmMenuRibbon
         object btProjectConvert: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 41
-          Height = 54
+          Width = 33
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -16340,7 +16385,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btProjectSettings: TAdvGlowButton
-          Left = 43
+          Left = 35
           Top = 2
           Width = 48
           Height = 67
@@ -16522,7 +16567,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btScripting: TAdvGlowButton
-          Left = 91
+          Left = 83
           Top = 2
           Width = 48
           Height = 67
@@ -16692,10 +16737,10 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object AdvToolBar6: TAdvToolBar
-        Left = 149
+        Left = 141
         Top = 3
-        Width = 59
-        Height = 53
+        Width = 48
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -16721,8 +16766,8 @@ object fmMenuRibbon: TfmMenuRibbon
         object btProjectAureliusExport: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 53
-          Height = 54
+          Width = 42
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -16910,7 +16955,7 @@ object fmMenuRibbon: TfmMenuRibbon
       Left = -1
       Top = 60
       Width = 946
-      Height = 59
+      Height = 61
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2
@@ -16919,8 +16964,8 @@ object fmMenuRibbon: TfmMenuRibbon
       object toolbarDM: TAdvToolBar
         Left = 3
         Top = 3
-        Width = 186
-        Height = 53
+        Width = 161
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -16944,10 +16989,10 @@ object fmMenuRibbon: TfmMenuRibbon
         ParentOptionPicture = True
         ToolBarIndex = 0
         object btAbout: TAdvGlowButton
-          Left = 140
+          Left = 123
           Top = 2
-          Width = 42
-          Height = 54
+          Width = 34
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -17188,10 +17233,10 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btManual: TAdvGlowButton
-          Left = 45
+          Left = 36
           Top = 2
-          Width = 42
-          Height = 54
+          Width = 34
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -17388,8 +17433,8 @@ object fmMenuRibbon: TfmMenuRibbon
         object btHomePage: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 43
-          Height = 54
+          Width = 34
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -17603,7 +17648,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btWebUpdate: TAdvGlowButton
-          Left = 87
+          Left = 70
           Top = 2
           Width = 53
           Height = 67
@@ -17809,7 +17854,7 @@ object fmMenuRibbon: TfmMenuRibbon
       Left = -1
       Top = 60
       Width = 946
-      Height = 59
+      Height = 61
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2
@@ -17818,8 +17863,8 @@ object fmMenuRibbon: TfmMenuRibbon
       object AdvToolBar2: TAdvToolBar
         Left = 3
         Top = 3
-        Width = 253
-        Height = 53
+        Width = 245
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -17845,8 +17890,8 @@ object fmMenuRibbon: TfmMenuRibbon
         object btDiagAddTable: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 38
-          Height = 54
+          Width = 30
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -17946,7 +17991,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btDiagAddIdRel: TAdvGlowButton
-          Left = 40
+          Left = 32
           Top = 2
           Width = 71
           Height = 67
@@ -18045,7 +18090,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btDiagAddNote: TAdvGlowButton
-          Left = 111
+          Left = 103
           Top = 24
           Width = 138
           Height = 22
@@ -18142,7 +18187,7 @@ object fmMenuRibbon: TfmMenuRibbon
           MaxButtonSizeState = bsLabel
         end
         object btDiagAddNonIDRel: TAdvGlowButton
-          Left = 111
+          Left = 103
           Top = 2
           Width = 138
           Height = 22
@@ -18214,10 +18259,10 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object AdvToolBar9: TAdvToolBar
-        Left = 702
+        Left = 680
         Top = 3
-        Width = 138
-        Height = 53
+        Width = 130
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -18243,8 +18288,8 @@ object fmMenuRibbon: TfmMenuRibbon
         object btDiagPreview: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 38
-          Height = 54
+          Width = 30
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -18397,7 +18442,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btDiagExport: TAdvGlowButton
-          Left = 87
+          Left = 79
           Top = 2
           Width = 47
           Height = 67
@@ -18554,7 +18599,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Layout = blGlyphTopAdjusted
         end
         object btDiagPrint: TAdvGlowButton
-          Left = 40
+          Left = 32
           Top = 2
           Width = 47
           Height = 67
@@ -18688,10 +18733,10 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object barPageSetup: TAdvToolBar
-        Left = 843
+        Left = 813
         Top = 3
-        Width = 103
-        Height = 53
+        Width = 93
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -18717,8 +18762,8 @@ object fmMenuRibbon: TfmMenuRibbon
         object btDiagPageOrientation: TAdvOfficeToolSelector
           Left = 2
           Top = 2
-          Width = 50
-          Height = 54
+          Width = 40
+          Height = 43
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -18962,7 +19007,7 @@ object fmMenuRibbon: TfmMenuRibbon
           UIStyle = tsOffice2016White
         end
         object btDiagPaperSize: TAdvOfficeToolSelector
-          Left = 52
+          Left = 42
           Top = 2
           Width = 47
           Height = 67
@@ -19171,10 +19216,10 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object barDiagShape: TAdvToolBar
-        Left = 506
+        Left = 484
         Top = 3
         Width = 193
-        Height = 53
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -19201,10 +19246,10 @@ object fmMenuRibbon: TfmMenuRibbon
         ParentOptionPicture = True
         ToolBarIndex = 4
         object btDiagFontName: TAdvOfficeFontSelector
-          Left = 6
-          Top = 8
-          Width = 102
-          Height = 15
+          Left = 5
+          Top = 6
+          Width = 82
+          Height = 12
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -19280,10 +19325,10 @@ object fmMenuRibbon: TfmMenuRibbon
           UIStyle = tsOffice2016White
         end
         object btDiagFontSize: TAdvOfficeFontSizeSelector
-          Left = 113
-          Top = 8
-          Width = 35
-          Height = 15
+          Left = 90
+          Top = 6
+          Width = 28
+          Height = 12
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -19324,10 +19369,10 @@ object fmMenuRibbon: TfmMenuRibbon
           UIStyle = tsOffice2016White
         end
         object btDiagShapeColor: TAdvOfficeColorSelector
-          Left = 6
-          Top = 37
-          Width = 66
-          Height = 18
+          Left = 5
+          Top = 30
+          Width = 53
+          Height = 14
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -19746,10 +19791,10 @@ object fmMenuRibbon: TfmMenuRibbon
           UIStyle = tsOffice2016White
         end
         object btDiagTextColor: TAdvOfficeColorSelector
-          Left = 82
-          Top = 37
-          Width = 66
-          Height = 18
+          Left = 66
+          Top = 30
+          Width = 53
+          Height = 14
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -20169,10 +20214,10 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object AdvToolBar10: TAdvToolBar
-        Left = 259
+        Left = 251
         Top = 3
         Width = 89
-        Height = 53
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -20197,9 +20242,9 @@ object fmMenuRibbon: TfmMenuRibbon
         ToolBarIndex = 1
         object btDiagFind: TAdvGlowButton
           Left = 2
-          Top = 24
-          Width = 66
-          Height = 18
+          Top = 2
+          Width = 53
+          Height = 14
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -20299,7 +20344,7 @@ object fmMenuRibbon: TfmMenuRibbon
         end
         object btDiagDuplicate: TAdvGlowButton
           Left = 2
-          Top = 2
+          Top = 16
           Width = 83
           Height = 22
           Margins.Left = 2
@@ -20390,10 +20435,10 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object AdvToolBar11: TAdvToolBar
-        Left = 425
+        Left = 417
         Top = 3
-        Width = 78
-        Height = 53
+        Width = 64
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -20419,8 +20464,8 @@ object fmMenuRibbon: TfmMenuRibbon
         object btDiagNavigator: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 72
-          Height = 18
+          Width = 58
+          Height = 14
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -20515,10 +20560,10 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object AdvToolBar12: TAdvToolBar
-        Left = 351
+        Left = 343
         Top = 3
         Width = 71
-        Height = 53
+        Height = 55
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -20546,9 +20591,9 @@ object fmMenuRibbon: TfmMenuRibbon
         ToolBarIndex = 2
         object btDiagFitAll: TAdvGlowButton
           Left = 2
-          Top = 19
-          Width = 52
-          Height = 18
+          Top = 15
+          Width = 42
+          Height = 14
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -20644,8 +20689,8 @@ object fmMenuRibbon: TfmMenuRibbon
         object btDiagZoom100: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 52
-          Height = 18
+          Width = 42
+          Height = 14
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -20739,9 +20784,9 @@ object fmMenuRibbon: TfmMenuRibbon
         end
         object edDiagZoom: TDgrZoomSelector
           Left = 2
-          Top = 40
-          Width = 50
-          Height = 15
+          Top = 32
+          Width = 40
+          Height = 12
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -20769,7 +20814,7 @@ object fmMenuRibbon: TfmMenuRibbon
     object AdvShapeButton1: TAdvShapeButton
       Left = 0
       Top = 30
-      Width = 44
+      Width = 35
       Height = 19
       Margins.Left = 2
       Margins.Top = 2
@@ -20990,9 +21035,9 @@ object fmMenuRibbon: TfmMenuRibbon
     end
     object AdvQuickAccessToolBar: TAdvQuickAccessToolBar
       Left = 5
-      Top = 14
+      Top = 18
       Width = 140
-      Height = 20
+      Height = 16
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2
@@ -21000,7 +21045,7 @@ object fmMenuRibbon: TfmMenuRibbon
       ShowCustomizeOption = False
       object btQuickSave: TAdvGlowButton
         Left = 78
-        Top = 0
+        Top = -2
         Width = 22
         Height = 20
         Margins.Left = 2
@@ -21091,7 +21136,7 @@ object fmMenuRibbon: TfmMenuRibbon
       end
       object btQuickOpen: TAdvGlowButton
         Left = 56
-        Top = 0
+        Top = -2
         Width = 22
         Height = 20
         Margins.Left = 2
@@ -21180,7 +21225,7 @@ object fmMenuRibbon: TfmMenuRibbon
       end
       object btQuickNew: TAdvGlowButton
         Left = 27
-        Top = 0
+        Top = -2
         Width = 29
         Height = 20
         Margins.Left = 2
@@ -21263,7 +21308,7 @@ object fmMenuRibbon: TfmMenuRibbon
       end
       object btQuickClose: TAdvGlowButton
         Left = 100
-        Top = 0
+        Top = -2
         Width = 22
         Height = 20
         Margins.Left = 2
@@ -21349,9 +21394,9 @@ object fmMenuRibbon: TfmMenuRibbon
   end
   object sbBar: TAdvOfficeStatusBar
     Left = 0
-    Top = 558
+    Top = 485
     Width = 944
-    Height = 15
+    Height = 12
     Margins.Left = 2
     Margins.Top = 2
     Margins.Right = 2
@@ -21359,7 +21404,7 @@ object fmMenuRibbon: TfmMenuRibbon
     AnchorHint = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -9
     Font.Name = 'Tahoma'
     Font.Style = []
     Panels = <

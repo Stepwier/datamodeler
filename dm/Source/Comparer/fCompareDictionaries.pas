@@ -421,6 +421,7 @@ begin
     UpdateSQLScriptFilter;
     // resync also compares the column structure of views (view-backed tables)
     FSQLFilter.IncludeViewTables := FMode = cmResync;
+    FSQLFilter.ResyncMode := FMode = cmResync;
 
     if Assigned(FListActions) then
       FreeAndNil(FListActions);
