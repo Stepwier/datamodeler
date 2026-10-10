@@ -44,6 +44,7 @@ const
   SDBO_SqlServerIntegratedSecurity = 'INTEGRATED SECURITY';
   SDBO_SqlServerODBCDriver = 'ODBC DRIVER';
   SDBO_SqlServerTrustServerCertificate = 'TRUST SERVER CERTIFICATE';
+  SDBO_SqlServerODBCAdvanced = 'ODBC ADVANCED';
 
 type
   TDBConnection = class
@@ -226,9 +227,16 @@ begin
                 OSAuthent :=
                   GetDBParamValue(SDBO_SqlServerIntegratedSecurity) = 'TRUE';
                 ODBCDriver := GetDBParamValue(SDBO_SqlServerODBCDriver);
+                ODBCAdvanced := GetDBParamValue(SDBO_SqlServerODBCAdvanced);
                 // ODBC Driver 18+ encrypts by default and rejects self-signed server certificates
-                if SameText(GetDBParamValue(SDBO_SqlServerTrustServerCertificate), 'TRUE') then
-                  Custom['ODBCAdvanced'] := 'TrustServerCertificate=yes';
+                if SameText(GetDBParamValue(SDBO_SqlServerTrustServerCertificate), 'TRUE')
+                  and (Pos('TRUSTSERVERCERTIFICATE', UpperCase(ODBCAdvanced)) = 0) then
+                begin
+                  if ODBCAdvanced <> '' then
+                    ODBCAdvanced := ODBCAdvanced + ';TrustServerCertificate=yes'
+                  else
+                    ODBCAdvanced := 'TrustServerCertificate=yes';
+                end;
               end;
             fdbSqlAzure:
               begin

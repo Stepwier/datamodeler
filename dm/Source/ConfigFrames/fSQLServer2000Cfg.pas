@@ -31,6 +31,8 @@ type
     Label2: TLabel;
     cbTrustServerCertificate: TCheckBox;
     FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink;
+    Label6: TLabel;
+    edOdbcAdvanced: TEdit;
     procedure rbLoginInfoClick(Sender: TObject);
     procedure rbIntegratedSecurityClick(Sender: TObject);
     procedure cboServersClick(Sender: TObject);
@@ -248,6 +250,7 @@ procedure TfrSQLServer2000Cfg.FrameInitialization(ADBType: TDatabaseType);
 begin
   cboServers.Items.Clear;
   cbODBCDriver.Items.Clear;
+  edOdbcAdvanced.Text := '';
   FServerListLoaded := false;
   FDatabaseListLoaded := false;
   FDBType := ADBType;
@@ -300,6 +303,7 @@ begin
       r.Values[SDBO_SqlServerTrustServerCertificate] := 'TRUE'
     else
       r.Values[SDBO_SqlServerTrustServerCertificate] := 'FALSE';
+    r.Values['ODBC ADVANCED'] := edOdbcAdvanced.Text;
     Result := r.Text;
   finally
     r.Free;
@@ -333,6 +337,7 @@ begin
     FedPassword.Text := UndoTheStr(r.Values['PASSWORD']);
     cbODBCDriver.Text := r.Values['ODBC DRIVER'];
     cbTrustServerCertificate.Checked := SameText(r.Values[SDBO_SqlServerTrustServerCertificate], 'TRUE');
+    edOdbcAdvanced.Text := r.Values['ODBC ADVANCED'];
     if SameText(r.Values['INTEGRATED SECURITY'], 'FALSE') then
       rbLoginInfo.Checked := true
     else
