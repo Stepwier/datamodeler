@@ -129,14 +129,17 @@ end;
 
 procedure TfmGenerateScript.UpdateTableList;
 var
-  i : Integer;
+  i, idx : Integer;
 begin
   with FMetaData.DataDictionary.Tables do
   begin
     for i := 0 to Count - 1 do
     begin
-      lbTables.Items.AddObject(Items[i].TableName, TObject(Items[i]));
-      lbTables.Checked[i] := true;
+      // view-backed tables are never part of the DDL script
+      if Items[i].IsView then
+        Continue;
+      idx := lbTables.Items.AddObject(Items[i].TableName, TObject(Items[i]));
+      lbTables.Checked[idx] := true;
     end;
     lbTables.Sorted := True;
   end;

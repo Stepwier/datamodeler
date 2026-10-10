@@ -13,7 +13,9 @@ uses
 type
   TActionTableProp = (atpNone, atpField, atpIndex, atpConstraint, atpRelationship, atpTrigger);
 
-  TCompareMode = (cmProjects, cmVersions);
+  {cmResync: model (base) compared with a live database (target); changes can be
+   applied to the model. cmProjects: merge, script only (see ADR-0001)}
+  TCompareMode = (cmProjects, cmVersions, cmResync);
 
   TDictionaryTreeNodeType =
     (tntNone, tntTable, tntField, tntIndex,
@@ -101,7 +103,10 @@ type
     FTargetDictionaryTree: TVirtualStringTree;
     FTargetScript: TStrings;
     FTreeChanging: boolean;
+    FScopeTableName: string;
+    FApplied: boolean;
     function MouseInControl(AControl: TControl): boolean;
+    procedure UncheckRemoveActions(ANodes: TDictionaryTreeNodes);
 
     procedure AppEventsIdle(Sender: TObject; var Done: Boolean);
     function CreateDictionaryTree(AParent: TWinControl; ABase: boolean): TVirtualStringTree;
@@ -167,6 +172,11 @@ type
     function HasSelectedActions: boolean;
     procedure Focus;
     procedure SetDictionaryCaptions(ABase, ATarget: string);
+    {cmResync only: restricts the comparison to one table/view (empty = whole project).
+     Set before CompareDictionaries}
+    property ScopeTableName: string read FScopeTableName write FScopeTableName;
+    {True after the selected actions were applied to the project}
+    property Applied: boolean read FApplied;
   end;
 
   TDictionaryTreeNodes = class(TCollection)
@@ -327,7 +337,10 @@ begin
     else
     begin
       for i := 0 to listApply.Count - 1 do
-        TatDBAction(listApply.Items[i]).ApplyDBAction(FCurrentMetaData.DataDictionary);
+        // ADR-0001: merge (cmProjects) only ever adds tables to the project
+        if (FMode <> cmProjects) or (listApply.Items[i] is TatCreateTableAction) then
+          TatDBAction(listApply.Items[i]).ApplyDBAction(FCurrentMetaData.DataDictionary);
+      FApplied := true;
       FCurrentMetaData.OnModify(FCurrentMetaData);
       if Assigned(Owner) then
         TForm(Owner).Close;
@@ -376,12 +389,13 @@ begin
   if FCurrentMetaData <> ACurrentMetaData then
   begin
     FCurrentMetaData := ACurrentMetaData;
-    FCanApplyChanges := AMode = cmProjects;
+    FMode := AMode;
+    FCanApplyChanges := AMode in [cmProjects, cmResync];
     InitFilterOptions;
   end;
 
   case AMode of
-    cmProjects: FImageListAction := imlActionArrow;
+    cmProjects, cmResync: FImageListAction := imlActionArrow;
     cmVersions: FImageListAction := imlActionCheck;
   end;
   popDiffAction.Images := FImageListAction;
@@ -405,10 +419,21 @@ begin
   FRedoingComparison := true;
   try
     UpdateSQLScriptFilter;
+    // resync also compares the column structure of views (view-backed tables)
+    FSQLFilter.IncludeViewTables := FMode = cmResync;
 
     if Assigned(FListActions) then
       FreeAndNil(FListActions);
     FListActions := CompareDatabases(FBaseDictionary, FTargetDictionary, FCompareByIds, FSQLFilter);
+
+    if FMode = cmResync then
+    begin
+      FListActions.RemoveNotApplicable;
+      if FScopeTableName <> '' then
+        for i := FListActions.Count - 1 downto 0 do
+          if not ActionRelatesToTable(TatDBAction(FListActions[i]), FScopeTableName) then
+            FListActions.Delete(i);
+    end;
 
     SetLength(FApplyAction, 0);
     SetLength(FApplyAction, FListActions.Count);
@@ -428,6 +453,10 @@ begin
       UpdateDictionaryTrees;
       for i := 0 to FDictionaryTreeNodes.Count - 1 do
         TreeSetDiffAction(FDictionaryTreeNodes[i], DIFFACTION_APPLYTARGET);
+
+      // no undo in the application: removals must be checked explicitly
+      if FMode = cmResync then
+        UncheckRemoveActions(FDictionaryTreeNodes);
 
       //reapply actions (all FApplyAction set to true). Maybe not needed
     end;
@@ -525,6 +554,56 @@ function TfmCompareDictionaries.DictionaryContainsObject(ATree: TBaseVirtualTree
 begin
   result := ((ATree = FBaseDictionaryTree) and Assigned(ANode.BaseObject))
     or ((ATree = FTargetDictionaryTree) and Assigned(ANode.TargetObject));
+end;
+
+procedure TfmCompareDictionaries.UncheckRemoveActions(ANodes: TDictionaryTreeNodes);
+
+  {True when ANode has actions and all of them are removals. A node mixing removals
+   with creations/changes (e.g. object dropped and recreated) stays checked, since
+   unchecking it would also uncheck the creations/changes}
+  function HasOnlyRemoveActions(ANode: TDictionaryTreeNode): boolean;
+  var
+    j: integer;
+  begin
+    result := ANode.FActionIndex[0] >= 0;
+    for j := 0 to High(ANode.FActionIndex) do
+      if (ANode.FActionIndex[j] >= 0)
+        and not IsRemoveAction(TatDBAction(FListActions[ANode.FActionIndex[j]])) then
+        Exit(false);
+  end;
+
+  {True when ANode has changed children and none of them is set to be applied}
+  function AllChangedChildrenUnchecked(ANode: TDictionaryTreeNode): boolean;
+  var
+    j: integer;
+    changed: boolean;
+  begin
+    changed := false;
+    for j := 0 to ANode.Nodes.Count - 1 do
+      if ANode.Nodes[j].CompareState = csDifferent then
+      begin
+        if ANode.Nodes[j].DiffAction = DIFFACTION_APPLYTARGET then
+          Exit(false);
+        changed := true;
+      end;
+    result := changed;
+  end;
+
+var
+  i: integer;
+  node: TDictionaryTreeNode;
+begin
+  // bottom-up, so a parent node reflects the state of its children
+  for i := 0 to ANodes.Count - 1 do
+  begin
+    node := ANodes[i];
+    UncheckRemoveActions(node.Nodes);
+    if HasOnlyRemoveActions(node) then
+      node.DiffAction := DIFFACTION_DIFF
+    else if (node.FActionIndex[0] < 0) and AllChangedChildrenUnchecked(node) then
+      // grouping node without own action (e.g. table with only removed fields)
+      node.DiffAction := DIFFACTION_DIFF;
+  end;
 end;
 
 procedure TfmCompareDictionaries.DictionarySelectDiffAction(AActionIndex: integer; ASelect: boolean);
@@ -1460,6 +1539,11 @@ begin
     {if FCanApplyChanges then
       Items.Add('Apply changes to project');}
     ItemIndex := 0;
+    if FMode = cmResync then
+    begin
+      Items.Add('Apply changes to project');
+      ItemIndex := 1;
+    end;
   end;
 end;
 
@@ -1797,7 +1881,9 @@ begin
       i := 0;
       while (i <= 4) and (FActionIndex[i] >= 0) do
         inc(i);
-      FActionIndex[i] := AActionIndex;
+      // at most 5 actions per node: writing FActionIndex[5] would overwrite memory
+      if i <= 4 then
+        FActionIndex[i] := AActionIndex;
       if not AChanged then
         FullCompareState;
     end;

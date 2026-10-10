@@ -417,7 +417,7 @@ begin
   begin
     if OldField.ConstraintNotNullName > '' then
       ActionRemoveConstraintFieldNotNull(OldField);
-    if OldField.ConstraintNotNullName > '' then
+    if NewField.ConstraintNotNullName > '' then
       ActionCreateConstraintFieldNotNull(NewField);
   end;
 
@@ -749,7 +749,8 @@ begin
     for iTable := 0 to OldDB.Tables.Count - 1 do
     begin
       CheckProgressCanceled;
-      if NewDB.Tables.IndexOfTid(OldDB.Tables[iTable].TID) < 0 then
+      if FFilter.MustCompareTable(OldDB.Tables[iTable])
+        and (NewDB.Tables.IndexOfTid(OldDB.Tables[iTable].TID) < 0) then
         PerformRemoveTable(OldDB.Tables[iTable]);
       CheckProgressStep;
     end;
@@ -758,7 +759,9 @@ begin
     for iTable:=0 to NewDB.Tables.Count-1 do
     begin
       CheckProgressCanceled;
-      if OldDB.Tables.IndexOfTid(NewDB.Tables[iTable].TID) < 0 then
+      if not FFilter.MustCompareTable(NewDB.Tables[iTable]) then
+        // view-backed table, ignored
+      else if OldDB.Tables.IndexOfTid(NewDB.Tables[iTable].TID) < 0 then
       begin
         PerformCreateTable(NewDB.Tables[iTable]);
       end
@@ -775,7 +778,8 @@ begin
     for iTable:=0 to OldDB.Tables.Count-1 do
     begin
       CheckProgressCanceled;
-      if NewDB.IndexOfTable(OldDB.Tables[iTable].TableName) < 0 then
+      if FFilter.MustCompareTable(OldDB.Tables[iTable])
+        and (NewDB.IndexOfTable(OldDB.Tables[iTable].TableName) < 0) then
         PerformRemoveTable(OldDB.Tables[iTable]);
       CheckProgressStep;
     end;
@@ -784,7 +788,9 @@ begin
     for iTable:=0 to NewDB.Tables.Count-1 do
     begin
       CheckProgressCanceled;
-      if OldDB.IndexOfTable(NewDB.Tables[iTable].TableName) < 0 then
+      if not FFilter.MustCompareTable(NewDB.Tables[iTable]) then
+        // view-backed table, ignored
+      else if OldDB.IndexOfTable(NewDB.Tables[iTable].TableName) < 0 then
       begin
         PerformCreateTable(NewDB.Tables[iTable]);
       end else

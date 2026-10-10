@@ -21,7 +21,12 @@ type
 
   TExecuteSQLEvent = procedure(ASQL: string) of object;
 
-  TatDBActionList = class(TObjectList);
+  TatDBActionList = class(TObjectList)
+  public
+    {Removes (and frees, when the list owns its objects) the actions that cannot be
+    applied to a dictionary, e.g. rename actions}
+    procedure RemoveNotApplicable;
+  end;
 
   TSQLScriptFilterItem = (
     fiNone,
@@ -132,6 +137,8 @@ type
   public
     constructor Create(AList: TatDBActionList);
     procedure ApplyDBAction(ADictionary: TGDAODatabase); virtual;
+    {True when the action class overrides ApplyDBAction}
+    function CanApplyDBAction: boolean;
   published
     property Description: string read GetDescription;
     property Category: TCategoryAction read GetCategory;
@@ -143,6 +150,7 @@ type
     FItems: TSQLScriptFilterItems;
     FExcludedTables: TStrings;
     FCategories: TGDAOCategoryTypes;
+    FIncludeViewTables: boolean;
 
     {IsTableIncluded is different than MustInclude(Table). This function
     only checks for the excluded tables list, and ignores if the filter items
@@ -165,9 +173,16 @@ type
     function MustIncludeConstraint(AField: TGDAOField): boolean;
     function MustIncludeComments: boolean;
 
+    {Returns false for view-backed tables (IsView=True) unless IncludeViewTables is set.
+    Used by the comparer to ignore view-backed tables on both sides}
+    function MustCompareTable(ATable: TGDAOTable): boolean;
+
     property Items: TSQLScriptFilterItems read FItems write FItems;
     property Categories: TGDAOCategoryTypes read FCategories write FCategories;
     property ExcludedTables: TStrings read FExcludedTables;
+    {Default false: Update Database / Generate Script never see view-backed tables.
+    Resync sets it to true so view columns are compared}
+    property IncludeViewTables: boolean read FIncludeViewTables write FIncludeViewTables;
   end;
 
   {$IFNDEF DATAMODELER}
@@ -405,6 +420,25 @@ begin
 
 end;
 
+function TatDBAction.CanApplyDBAction: boolean;
+var
+  apply: procedure(ADictionary: TGDAODatabase) of object;
+begin
+  apply := ApplyDBAction;
+  result := TMethod(apply).Code <> @TatDBAction.ApplyDBAction;
+end;
+
+{ TatDBActionList }
+
+procedure TatDBActionList.RemoveNotApplicable;
+var
+  i: integer;
+begin
+  for i := Count - 1 downto 0 do
+    if not TatDBAction(Items[i]).CanApplyDBAction then
+      Delete(i);
+end;
+
 constructor TatDBAction.Create(AList: TatDBActionList);
 begin
   if AList <> nil then
@@ -431,6 +465,7 @@ begin
   begin
     FItems := TSQLScriptFilter(ASource).FItems;
     FCategories := TSQLScriptFilter(ASource).FCategories;
+    FIncludeViewTables := TSQLScriptFilter(ASource).FIncludeViewTables;
     FExcludedTables.Assign(TSQLScriptFilter(ASource).FExcludedTables);
   end else
     inherited Assign(ASource);
@@ -451,7 +486,12 @@ end;
 
 function TSQLScriptFilter.IsTableIncluded(ATable: TGDAOTable): boolean;
 begin
-  result := (ATable <> nil) and (FExcludedTables.IndexOf(ATable.TableName) < 0);
+  result := MustCompareTable(ATable) and (FExcludedTables.IndexOf(ATable.TableName) < 0);
+end;
+
+function TSQLScriptFilter.MustCompareTable(ATable: TGDAOTable): boolean;
+begin
+  result := (ATable <> nil) and (FIncludeViewTables or not ATable.IsView);
 end;
 
 function TSQLScriptFilter.MustInclude(AIndex: TGDAOIndex): boolean;

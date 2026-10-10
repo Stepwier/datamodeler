@@ -6,7 +6,7 @@ interface
 
 uses
   SysUtils, Classes, ProjectDBModule, qryretrv, uSQLModule,
-  dgDBStructurer, Dialogs, dgConsts, dgBase, dgDBTypes;
+  dgDBStructurer, Dialogs, dgConsts, dgBase, dgDBTypes, uGDAO;
 
 const
   { AbsoluteDB connection params }
@@ -43,6 +43,7 @@ const
   SDBO_SqlServerPassword = 'PASSWORD';
   SDBO_SqlServerIntegratedSecurity = 'INTEGRATED SECURITY';
   SDBO_SqlServerODBCDriver = 'ODBC DRIVER';
+  SDBO_SqlServerTrustServerCertificate = 'TRUST SERVER CERTIFICATE';
 
 type
   TDBConnection = class
@@ -96,6 +97,14 @@ function CreateDBConnection(ADBType: TDatabaseType; AConnectStr: String)
   : TDBConnection;
 function CreateAndConnectDBConnection(ADBType: TDatabaseType;
   AConnectStr: String): TDBConnection;
+
+{Retrieves the structure of a live database into a new temporary dictionary, to be
+ compared with AModel (DB Resync). Raises EGUIException when ADBType is not the
+ database type of AModel. The connection is closed before returning; the caller owns
+ the result and must keep it alive until the compare actions were applied, since
+ they reference its objects}
+function RetrieveResyncDictionary(AModel: TGDAODatabase; ADBType: TDatabaseType;
+  AConnectStr: String; AOnProgress: TProgressEvent = nil): TGDAODatabase;
 
 implementation
 
@@ -217,6 +226,9 @@ begin
                 OSAuthent :=
                   GetDBParamValue(SDBO_SqlServerIntegratedSecurity) = 'TRUE';
                 ODBCDriver := GetDBParamValue(SDBO_SqlServerODBCDriver);
+                // ODBC Driver 18+ encrypts by default and rejects self-signed server certificates
+                if SameText(GetDBParamValue(SDBO_SqlServerTrustServerCertificate), 'TRUE') then
+                  Custom['ODBCAdvanced'] := 'TrustServerCertificate=yes';
               end;
             fdbSqlAzure:
               begin
@@ -366,6 +378,35 @@ begin
         raise EGUIException.Create(e.Message);
       end;
     end;
+  end;
+end;
+
+function RetrieveResyncDictionary(AModel: TGDAODatabase; ADBType: TDatabaseType;
+  AConnectStr: String; AOnProgress: TProgressEvent): TGDAODatabase;
+var
+  connection: TDBConnection;
+begin
+  if ADBType = nil then
+    raise EGUIException.Create('No database type specified for the resync connection.');
+  if ADBType <> AModel.DatabaseType then
+    raise EGUIException.CreateFmt(
+      'The connection database type (%s) is not the database type of the project (%s). Resync is not possible.',
+      [ADBType.Caption, AModel.DatabaseType.Caption]);
+
+  result := TGDAODatabase.Create;
+  try
+    result.DatabaseType := ADBType;
+    TDBProperties.LoadAll(result);
+    connection := CreateAndConnectDBConnection(ADBType, AConnectStr);
+    try
+      connection.DataRetriever.OnProgress := AOnProgress;
+      connection.DataRetriever.RetrieveDictionary(result);
+    finally
+      connection.Free;
+    end;
+  except
+    result.Free;
+    raise;
   end;
 end;
 

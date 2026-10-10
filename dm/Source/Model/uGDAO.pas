@@ -83,6 +83,11 @@ type
     procedure Assign(Source: TPersistent); override; 
     function IndexOfTable( ATableName:string ):integer;
     function TableByName(ATableName:string):TGDAOTable;
+
+    // View-backed tables: TGDAOTable with IsView=True that holds the column structure of a view
+    function ViewTableByName(AViewName: string): TGDAOTable;
+    function ViewTable(AView: TGDAOObject): TGDAOTable;
+    function TableView(ATable: TGDAOTable): TGDAOObject;
     function RelationshipByName(ARelationshipName: string): TGDAORelationship; overload;
     function RelationshipByName(ARelationshipName, ATableName: string): TGDAORelationship; overload;
     function IndexExists(AIndexName: string): boolean;
@@ -198,7 +203,6 @@ type
     property Data: TObject read FData write FData;
     property ReadOnly: boolean read GetReadOnly write SetReadOnly;
     property Visible: boolean read GetVisible write SetVisible;
-    property IsView: Boolean read FIsView write FIsView;
   published
     property TableName: string read FTableName write FTableName;
     property Description: string read FDescription write FDescription;
@@ -212,6 +216,7 @@ type
     property PrimaryKeyIndex: TGDAOIndex read GetPrimaryKeyIndex write SetPrimaryKeyIndex;
     property TableCaption: string read GetTableCaption write SetTableCaption stored StoreTableCaption;
     property Restriction: TTableRestriction read GetRestriction write FRestriction default trNone;
+    property IsView: Boolean read FIsView write FIsView default False;
   end;
 
   TGDAOFields = class(TCollection)
@@ -1051,6 +1056,37 @@ begin
   result := FTables.FindByName(ATableName);
 end;
 
+function TGDD.ViewTableByName(AViewName: string): TGDAOTable;
+var
+  i: integer;
+begin
+  for i := 0 to FTables.Count - 1 do
+    if FTables[i].IsView and (CompareText(AViewName, FTables[i].TableName) = 0) then
+      Exit(FTables[i]);
+  result := nil;
+end;
+
+function TGDD.ViewTable(AView: TGDAOObject): TGDAOTable;
+begin
+  if (AView <> nil) and (AView.OwnerCategory <> nil)
+    and (AView.OwnerCategory.CategoryType = ctView) then
+    result := ViewTableByName(AView.ObjectName)
+  else
+    result := nil;
+end;
+
+function TGDD.TableView(ATable: TGDAOTable): TGDAOObject;
+var
+  category: TGDAOCategory;
+begin
+  result := nil;
+  if (ATable = nil) or not ATable.IsView then
+    Exit;
+  category := FCategories.FindByType(ctView);
+  if category <> nil then
+    result := category.Objects.FindByName(ATable.TableName);
+end;
+
 procedure TGDD.TableDestroyed(ATable: TGDAOTable);
 begin
   if Assigned(FOnTableDestroy) then
@@ -1570,7 +1606,8 @@ end;
 
 function TGDAOTable.GetVisible: boolean;
 begin
-  result := Restriction <> trHidden;
+  // View-backed tables are never shown as tables (project tree, diagrams, table pickers)
+  result := (Restriction <> trHidden) and not IsView;
 end;
 
 { TGDAORelationships }

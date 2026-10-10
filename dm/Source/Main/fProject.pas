@@ -63,6 +63,8 @@ type
     Addobject1: TMenuItem;
     acTable_Duplicate: TAction;
     DuplicateTable1: TMenuItem;
+    acTable_Resync: TAction;
+    ResyncFromDatabase1: TMenuItem;
     Panel1: TPanel;
     pnTree: TAdvNavBar;
     NavigatorPanel: TPanel;
@@ -107,6 +109,8 @@ type
     procedure acTable_FindInDiagramUpdate(Sender: TObject);
     procedure acTable_DuplicateUpdate(Sender: TObject);
     procedure acTable_DuplicateExecute(Sender: TObject);
+    procedure acTable_ResyncUpdate(Sender: TObject);
+    procedure acTable_ResyncExecute(Sender: TObject);
   private
     FElementarPanel: array[TTreeElementarNodes] of TAdvNavBarPanel;
     FElementarTree: array[TTreeElementarNodes] of TTreeView;
@@ -195,6 +199,7 @@ type
 
     function FindElementTreeView(AElement: TObject): TTreeView;
     function FocusedTreeView: TTreeView;
+    function SelectedResyncScope: TObject;
     function CreatePanelTreeView(APanel: TAdvNavBarPanel): TTreeView;
 
     procedure DeleteSelectedDiagramObjects;
@@ -220,6 +225,11 @@ type
 
     procedure DoSave(AFileName: string);
     function Open(AFileName:string): boolean;
+
+    {Resyncs the project structure from its database (the user connection stored in
+     the project options, asked for when missing): whole project when AScope is nil,
+     else only the given TGDAOTable or view (TGDAOObject). Shows a preview first}
+    procedure ResyncFromDatabase(AScope: TObject = nil);
 
     procedure RemoveDeleteFromDiagram;
 
@@ -263,7 +273,8 @@ implementation
 uses
   CommCtrl, uDBProperties, fNewRelation, fRelationshipDialog, fDuplicateTable,
   fSequenceEditor, TaskDialog, UAppRegistry,
-  Aurelius.ExportForm;
+  Aurelius.ExportForm, uConnectionsFile, uSystemClass, uDBConnect, fCompareProjects,
+  dgDBActions;
 
 const
   //IMAGETREE_DATADICTIONARY = 0;
@@ -2181,6 +2192,109 @@ begin
     (tv <> nil) and (tv = FElementarTree[elTables]) and
     (tv.Selected <> nil) and (integer(tv.Selected.Data) > DATA_OBJECT) and
 	  (TObject(tv.Selected.Data) is TGDAOTable);
+end;
+
+function TfmProject.SelectedResyncScope: TObject;
+var
+  tv: TTreeView;
+  obj: TObject;
+begin
+  result := nil;
+  tv := FocusedTreeView;
+  if (tv = nil) or (tv.Selected = nil) or (integer(tv.Selected.Data) <= DATA_OBJECT) then
+    Exit;
+  obj := TObject(tv.Selected.Data);
+  if (obj is TGDAOTable)
+    or ((obj is TGDAOObject) and (TGDAOObject(obj).OwnerCategory <> nil)
+      and (TGDAOObject(obj).OwnerCategory.CategoryType = ctView)) then
+    result := obj;
+end;
+
+procedure TfmProject.acTable_ResyncUpdate(Sender: TObject);
+begin
+  TAction(Sender).Enabled := SelectedResyncScope <> nil;
+end;
+
+procedure TfmProject.acTable_ResyncExecute(Sender: TObject);
+var
+  scope: TObject;
+begin
+  scope := SelectedResyncScope;
+  if scope <> nil then
+    ResyncFromDatabase(scope);
+end;
+
+procedure TfmProject.ResyncFromDatabase(AScope: TObject);
+var
+  connections: TConnectionsList;
+  connName, connStr, scopeName: string;
+  idx, i: integer;
+  setting: TConnectionSetting;
+  dbDictionary: TGDAODatabase;
+  applied: boolean;
+begin
+  connections := SystemConfig.UserConnections.List;
+
+  // connection stored in the project, or picked by the user
+  connName := FMetaData.UserOptions.Values[SResyncConnectionOption];
+  idx := connections.IndexOf(connName);
+  if (idx < 0) or (connections[idx].ConnDBType <> FMetaData.DataDictionary.DatabaseType) then
+  begin
+    if not SystemConfig.UserConnections.SelectConnectionDlg(
+      FMetaData.DataDictionary.DatabaseType, connName) then
+      Exit;
+    idx := connections.IndexOf(connName);
+    if idx < 0 then
+      Exit;
+    FMetaData.UserOptions.Values[SResyncConnectionOption] := connName;
+    FMetaData.DesignTimeChange(Self);
+  end;
+  setting := connections[idx];
+  if not setting.ConnectionStringDlg(connStr) then
+    Exit;
+
+  if AScope is TGDAOTable then
+    scopeName := TGDAOTable(AScope).TableName
+  else if AScope is TGDAOObject then
+    scopeName := TGDAOObject(AScope).ObjectName
+  else
+    scopeName := '';
+
+  Screen.Cursor := crHourGlass;
+  try
+    dbDictionary := RetrieveResyncDictionary(FMetaData.DataDictionary, setting.ConnDBType, connStr);
+  finally
+    Screen.Cursor := crDefault;
+  end;
+
+  try
+    // removals go through the project so tabs, tree nodes and diagram objects are removed too
+    TatRemoveTableAction.OnApplyRemove := DeleteTable;
+    TatRemoveRelationshipAction.OnApplyRemove := DeleteRelationship;
+    try
+      with TfrmCompareProjects.Create(nil) do
+      try
+        applied := DoResync(FMetaData, dbDictionary, connName, scopeName);
+      finally
+        Free;
+      end;
+    finally
+      TatRemoveTableAction.OnApplyRemove := nil;
+      TatRemoveRelationshipAction.OnApplyRemove := nil;
+    end;
+  finally
+    // actions referencing the database dictionary were freed with the compare form
+    dbDictionary.Free;
+  end;
+
+  if applied then
+  begin
+    ReloadTreeView;
+    RefreshOpenedDiagrams;
+    for i := 0 to FMetaData.DataDictionary.Tables.Count - 1 do
+      RefreshTableTab(FMetaData.DataDictionary.Tables[i]);
+    SetModified(nil);
+  end;
 end;
 
 procedure TfmProject.acTable_FindInDiagramExecute(Sender: TObject);

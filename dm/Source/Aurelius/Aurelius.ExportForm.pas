@@ -11,7 +11,7 @@ uses
   ComCtrls, uGDAO, AdvCombo, ExtCtrls,  Buttons, Menus,
   ScrMemo, IDEMain, atScript, atScripter, AdvUtil, AdvMemoToolBar, AdvToolBar,
   AdvToolBarExt, ScrMps, ScrCodeList, System.Actions, Vcl.ActnList,
-  IDEDialog;
+  IDEDialog, CheckLst;
 
 type
   TfmAureliusExport = class(TForm)
@@ -21,9 +21,16 @@ type
     PageControl1: TPageControl;
     tsMappings: TTabSheet;
     grTables: TAdvColumnGrid;
+    cbTablesFilter: TComboBox;
+    edTablesFilter: TEdit;
     PageControl2: TPageControl;
     tsFields: TTabSheet;
     grFields: TAdvColumnGrid;
+    cbFieldsFilter: TComboBox;
+    edFieldsFilter: TEdit;
+    pmFields: TPopupMenu;
+    mnFieldsSelectAll: TMenuItem;
+    mnFieldsUnselectAll: TMenuItem;
     tsAssociations: TTabSheet;
     grAssociations: TAdvColumnGrid;
     edTableName: TAdvEdit;
@@ -120,7 +127,33 @@ type
     Button2: TButton;
     cbLegacyDictionary: TCheckBox;
     cbDefaultNonNativePascalTypeConvertion: TAdvComboBox;
+    chColumnDefault: TCheckBox;
+    edColumnName: TAdvEdit;
+    chColumnRequired: TCheckBox;
+    chColumnNoInsert: TCheckBox;
+    chColumnNoUpdate: TCheckBox;
+    chColumnLazy: TCheckBox;
+    tsAttributes: TTabSheet;
+    lbIdFields: TLabel;
+    chTableAttrDefault: TCheckBox;
+    edTableAttrName: TAdvEdit;
+    edTableAttrSchema: TAdvEdit;
+    chIdDefault: TCheckBox;
+    cbIdGenerator: TAdvComboBox;
+    clbIdFields: TCheckListBox;
+    edIdGeneratorClass: TAdvEdit;
+    edIdGeneratorUnit: TAdvEdit;
+    lbIdGeneratorCode: TLabel;
+    pcIdGeneratorCode: TPageControl;
+    tsIdGenerateId: TTabSheet;
+    mmIdGeneratorCode: TScrMemo;
+    tsIdRetrieveAfterInsert: TTabSheet;
+    mmIdRetrieveCode: TScrMemo;
     procedure grTablesClick(Sender: TObject);
+    procedure TablesFilterChange(Sender: TObject);
+    procedure FieldsFilterChange(Sender: TObject);
+    procedure mnFieldsSelectAllClick(Sender: TObject);
+    procedure mnFieldsUnselectAllClick(Sender: TObject);
     procedure grFieldsClick(Sender: TObject);
     procedure grAssociationsClick(Sender: TObject);
     procedure SaveMappingsProperty(Sender: TObject);
@@ -179,6 +212,20 @@ type
     procedure EmptyGrid(AGrid: TAdvStringGrid);
     procedure EnableGrid(AGrid: TAdvStringGrid; AEnable: boolean);
     procedure LoadTablesGrid;
+    procedure LoadIdFields(ATable: TGDAOTable);
+    procedure LoadColumnOverride;
+    procedure LoadTableAttributes;
+    procedure SaveColumnOverride;
+    procedure SaveCustomId;
+    procedure UpdateIdGeneratorClassEnabled;
+    function CheckedIdFieldCount: Integer;
+    function MatchesFilter(ACombo: TComboBox; AEdit: TEdit; const AName: string; AIncluded: Boolean): Boolean;
+    function TableDisplayName(ATable: TGDAOTable): string;
+    procedure ClearTablesFilter;
+    procedure SetVisibleTablesIncluded(AIncluded: Boolean);
+    procedure SetVisibleFieldsIncluded(AIncluded: Boolean);
+    procedure UpdateTableRowStyle(ARow: integer);
+    procedure UpdateFieldRowStyle(ARow: integer);
     procedure LoadSequencesCombo;
     procedure LoadFieldsGrid(ATable: TGDAOTable);
     procedure LoadAssociationsGrid(ATable: TGDAOTable);
@@ -217,7 +264,13 @@ uses
   dgConsts,
   uDiagramClass, uTableDiagramBlock,
   Aurelius.SourceGenerator.Options.Xml,
-  uGDAODiagrams, fIDEEditor, dIDEActions;
+  uGDAODiagrams, fIDEEditor, dIDEActions, StrUtils;
+
+const
+  // Item order of the cbTablesFilter / cbFieldsFilter combo boxes
+  FilterAll = 0;
+  FilterIncluded = 1;
+  FilterExcluded = 2;
 
 {$R *.dfm}
 
@@ -492,15 +545,11 @@ begin
   begin
     if Diagram.Blocks[c] is TTableDiagramBlock then
     begin
+      // Update the mapping even when the table is hidden by the filter
+      FGenerator.TableMapping(TTableDiagramBlock(Diagram.Blocks[c]).Table).Excluded := not Select;
       RowIdx := FindRowFromObject(grTables, TTableDiagramBlock(Diagram.Blocks[c]).Table);
       if RowIdx >= 0 then
-      begin
-        if grTables.IsChecked(0, RowIdx) <> Select then
-        begin
-          grTables.SetCheckBoxState(0, RowIdx, Select);
-          grTablesCheckBoxChange(grTables, 0, RowIdx, Select);
-        end;
-      end;
+        grTables.SetCheckBoxState(0, RowIdx, Select);
     end;
   end;
 end;
@@ -611,6 +660,9 @@ procedure TfmAureliusExport.GoToSequenceControl(ATable: TGDAOTable);
 var
   I: integer;
 begin
+  // The table in error may be hidden by the filter
+  if FindRowFromObject(grTables, ATable) < 0 then
+    ClearTablesFilter;
   for I := 0 to grTables.RowCount - 1 do
     if ATable = ObjectFromGrid<TGDAOTable>(grTables, I) then
     begin
@@ -814,6 +866,75 @@ begin
       LoadMappingsProperty(cbFieldType);
     end else
 
+    if (Sender = chColumnDefault) and (SelectedFieldMapping <> nil) then
+    begin
+      SelectedFieldMapping.CustomColumn := not chColumnDefault.Checked;
+      if SelectedFieldMapping.CustomColumn then
+      begin
+        // start from the calculated attribute
+        SelectedFieldMapping.ColumnName := '';
+        SelectedFieldMapping.ColumnProps := FGenerator.DefaultColumnProps(SelectedField);
+      end;
+      LoadColumnOverride;
+      UpdateFieldRowStyle(grFields.Row);
+      UpdateTableRowStyle(grTables.Row);
+    end else
+    if ((Sender = edColumnName) or (Sender = chColumnRequired) or (Sender = chColumnNoInsert)
+      or (Sender = chColumnNoUpdate) or (Sender = chColumnLazy)) and (SelectedFieldMapping <> nil) then
+    begin
+      SaveColumnOverride;
+    end else
+
+    if (Sender = chTableAttrDefault) and (SelectedTableMapping <> nil) then
+    begin
+      SelectedTableMapping.CustomTable := not chTableAttrDefault.Checked;
+      SelectedTableMapping.TableName := '';
+      SelectedTableMapping.Schema := '';
+      LoadTableAttributes;
+      UpdateTableRowStyle(grTables.Row);
+    end else
+    if (Sender = edTableAttrName) and (SelectedTableMapping <> nil) then
+    begin
+      // the model table name is stored as empty, so a later rename in the model is followed
+      if edTableAttrName.Text = SelectedTable.TableName then
+        SelectedTableMapping.TableName := ''
+      else
+        SelectedTableMapping.TableName := Trim(edTableAttrName.Text);
+    end else
+    if (Sender = edTableAttrSchema) and (SelectedTableMapping <> nil) then
+    begin
+      SelectedTableMapping.Schema := Trim(edTableAttrSchema.Text);
+    end else
+    if (Sender = chIdDefault) and (SelectedTableMapping <> nil) then
+    begin
+      SelectedTableMapping.CustomId := not chIdDefault.Checked;
+      if SelectedTableMapping.CustomId then
+        SaveCustomId // start from the displayed default Id
+      else
+        SelectedTableMapping.IdFieldIds.Clear;
+      LoadTableAttributes;
+      UpdateTableRowStyle(grTables.Row);
+    end else
+    if ((Sender = cbIdGenerator) or (Sender = clbIdFields)) and (SelectedTableMapping <> nil) then
+    begin
+      // An entity needs at least one Id field: unchecking the last one is undone
+      if (Sender = clbIdFields) and (clbIdFields.ItemIndex >= 0)
+        and not clbIdFields.Checked[clbIdFields.ItemIndex] and (CheckedIdFieldCount = 0) then
+        clbIdFields.Checked[clbIdFields.ItemIndex] := True;
+      SaveCustomId;
+      UpdateIdGeneratorClassEnabled;
+    end else
+    if ((Sender = edIdGeneratorClass) or (Sender = edIdGeneratorUnit)) and (SelectedTableMapping <> nil) then
+    begin
+      SelectedTableMapping.IdGeneratorClass := Trim(edIdGeneratorClass.Text);
+      SelectedTableMapping.IdGeneratorUnit := Trim(edIdGeneratorUnit.Text);
+    end else
+    if ((Sender = mmIdGeneratorCode) or (Sender = mmIdRetrieveCode)) and (SelectedTableMapping <> nil) then
+    begin
+      SelectedTableMapping.IdGeneratorCode := mmIdGeneratorCode.Lines.Text;
+      SelectedTableMapping.IdRetrieveCode := mmIdRetrieveCode.Lines.Text;
+    end else
+
     if (Sender = edAssociationName) and (SelectedAssociationMapping <> nil) then
     begin
       SelectedAssociationMapping.PropertyName := edAssociationName.Text;
@@ -963,12 +1084,40 @@ begin
     FGenerator.FieldMapping(field).Excluded := not State;
 end;
 
+procedure TfmAureliusExport.SetVisibleFieldsIncluded(AIncluded: Boolean);
+var
+  row: Integer;
+  field: TGDAOField;
+begin
+  // Applies to the rows shown by the filter; required fields have no checkbox and stay included
+  for row := 0 to grFields.RowCount - 1 do
+  begin
+    field := ObjectFromGrid<TGDAOField>(grFields, row);
+    if (field <> nil) and not field.Required then
+    begin
+      FGenerator.FieldMapping(field).Excluded := not AIncluded;
+      grFields.SetCheckBoxState(0, row, AIncluded);
+    end;
+  end;
+end;
+
+procedure TfmAureliusExport.mnFieldsSelectAllClick(Sender: TObject);
+begin
+  SetVisibleFieldsIncluded(True);
+end;
+
+procedure TfmAureliusExport.mnFieldsUnselectAllClick(Sender: TObject);
+begin
+  SetVisibleFieldsIncluded(False);
+end;
+
 procedure TfmAureliusExport.grFieldsClick(Sender: TObject);
 begin
   LoadMappingsProperty(edFieldName);
   LoadMappingsProperty(chFieldNameDefault);
   LoadMappingsProperty(cbFieldType);
   LoadMappingsProperty(chFieldTypeDefault);
+  LoadColumnOverride;
 end;
 
 procedure TfmAureliusExport.grFieldsKeyDown(Sender: TObject; var Key: Word;
@@ -1025,6 +1174,7 @@ begin
   LoadMappingsProperty(chDynPropContainerDefault);
   LoadMappingsProperty(edModelNames);
   LoadMappingsProperty(edClassUnitName);
+  LoadTableAttributes;
 end;
 
 procedure TfmAureliusExport.grTablesKeyDown(Sender: TObject; var Key: Word;
@@ -1098,7 +1248,21 @@ begin
   FOptions.Tables.TryGetValue(ATable.TID, tableMapping);
   fields := FGenerator.GetPropertyFields(ATable);
   try
-    grFields.RowCount := fields.Count;
+    // Only the fields matching the filter get a row; required fields are always included
+    for c := fields.Count - 1 downto 0 do
+    begin
+      field := fields[c];
+      mapping := nil;
+      if tableMapping <> nil then
+        tableMapping.Fields.TryGetValue(field.FID, mapping);
+      if not MatchesFilter(cbFieldsFilter, edFieldsFilter, field.FieldName,
+        field.Required or (mapping = nil) or not mapping.Excluded) then
+        fields.Delete(c);
+    end;
+
+    grFields.Objects[0, 0] := nil; // the single empty row left when nothing matches
+    if fields.Count > 0 then
+      grFields.RowCount := fields.Count;
     for c := 0 to fields.Count - 1 do
     begin
       field := fields[c];
@@ -1111,6 +1275,7 @@ begin
       if not field.Required then
         grfields.AddCheckBox(0, row, (mapping = nil) or not mapping.Excluded, False);
       grFields.Cells[1, row] := field.FieldName;
+      UpdateFieldRowStyle(row);
       if selected = field then
         grFields.Row := c;
     end;
@@ -1170,29 +1335,404 @@ var
   c: Integer;
   row: integer;
   selected: TGDAOTable;
+  visible: TList<TGDAOTable>;
 begin
   selected := SelectedTable;
   EmptyGrid(grTables);
-  grTables.RowCount := FApp.DataDictionary.Tables.Count;
-  grTables.AddCheckBoxColumn(0);
-  for c := 0 to FApp.DataDictionary.Tables.Count - 1 do
-  begin
-    table := FApp.DataDictionary.Tables[c];
-    FOptions.Tables.TryGetValue(table.TID, mapping);
-    row := c;
+  grTables.Objects[0, 0] := nil; // the single empty row left when nothing matches
+  // Only the tables matching the filter get a row; the selection state lives in the mappings
+  visible := TList<TGDAOTable>.Create;
+  try
+    for c := 0 to FApp.DataDictionary.Tables.Count - 1 do
+    begin
+      table := FApp.DataDictionary.Tables[c];
+      // TableMapping (not FOptions.Tables) so views get their default "excluded" state
+      mapping := FGenerator.TableMapping(table);
+      if MatchesFilter(cbTablesFilter, edTablesFilter, TableDisplayName(table), not mapping.Excluded) then
+        visible.Add(table);
+    end;
 
-    // field object
-    grTables.Objects[0, row] := table;
-    // field properties
-    grTables.SetCheckBoxState(0, row, (mapping = nil) or not mapping.Excluded);
-    grTables.Cells[1, row] := table.TableName;
-    if selected = table then
-      grTables.Row := c;
+    if visible.Count > 0 then
+      grTables.RowCount := visible.Count;
+    grTables.AddCheckBoxColumn(0);
+    for row := 0 to visible.Count - 1 do
+    begin
+      table := visible[row];
+      // field object
+      grTables.Objects[0, row] := table;
+      // field properties
+      grTables.SetCheckBoxState(0, row, not FGenerator.TableMapping(table).Excluded);
+      grTables.Cells[1, row] := TableDisplayName(table);
+    end;
+    grTables.Options := grTables.Options + [goRowSelect];
+    grTables.Sort(0);
+    for c := 0 to grTables.RowCount - 1 do
+      UpdateTableRowStyle(c);
+    // Keep the selected table if it is still visible (after the sort)
+    row := FindRowFromObject(grTables, selected);
+    if row >= 0 then
+      grTables.Row := row;
+    EnableGrid(grTables, visible.Count > 0);
+  finally
+    visible.Free;
   end;
-  grTables.Options := grTables.Options + [goRowSelect];
-  grTables.Sort(0);
-  EnableGrid(grTables, FApp.DataDictionary.Tables.Count > 0);
   grTablesClick(nil);
+end;
+
+function TfmAureliusExport.TableDisplayName(ATable: TGDAOTable): string;
+begin
+  if ATable.IsView then
+    Result := ATable.TableName + ' (view)'
+  else
+    Result := ATable.TableName;
+end;
+
+function TfmAureliusExport.MatchesFilter(ACombo: TComboBox; AEdit: TEdit; const AName: string;
+  AIncluded: Boolean): Boolean;
+begin
+  case ACombo.ItemIndex of
+    FilterIncluded: Result := AIncluded;
+    FilterExcluded: Result := not AIncluded;
+  else
+    Result := True;
+  end;
+  if Result and (Trim(AEdit.Text) <> '') then
+    Result := ContainsText(AName, Trim(AEdit.Text));
+end;
+
+procedure TfmAureliusExport.TablesFilterChange(Sender: TObject);
+begin
+  LoadTablesGrid;
+end;
+
+procedure TfmAureliusExport.FieldsFilterChange(Sender: TObject);
+begin
+  LoadFieldsGrid(SelectedTable);
+end;
+
+procedure TfmAureliusExport.ClearTablesFilter;
+begin
+  if (cbTablesFilter.ItemIndex = FilterAll) and (edTablesFilter.Text = '') then Exit;
+  cbTablesFilter.OnChange := nil;
+  edTablesFilter.OnChange := nil;
+  try
+    cbTablesFilter.ItemIndex := FilterAll;
+    edTablesFilter.Text := '';
+  finally
+    cbTablesFilter.OnChange := TablesFilterChange;
+    edTablesFilter.OnChange := TablesFilterChange;
+  end;
+  LoadTablesGrid;
+end;
+
+procedure TfmAureliusExport.SetVisibleTablesIncluded(AIncluded: Boolean);
+var
+  row: Integer;
+  table: TGDAOTable;
+begin
+  // Applies to the rows shown by the filter, and to their mappings (what the export reads)
+  for row := 0 to grTables.RowCount - 1 do
+  begin
+    table := ObjectFromGrid<TGDAOTable>(grTables, row);
+    if table <> nil then
+    begin
+      FGenerator.TableMapping(table).Excluded := not AIncluded;
+      grTables.SetCheckBoxState(0, row, AIncluded);
+    end;
+  end;
+end;
+
+procedure TfmAureliusExport.UpdateTableRowStyle(ARow: integer);
+var
+  table: TGDAOTable;
+  mapping: TTableMapping;
+  fieldMapping: TFieldMapping;
+  overridden: boolean;
+  styles: TFontStyles;
+begin
+  if (ARow < 0) or (ARow >= grTables.RowCount) then Exit;
+  table := ObjectFromGrid<TGDAOTable>(grTables, ARow);
+  if table = nil then Exit;
+
+  overridden := False;
+  if FOptions.Tables.TryGetValue(table.TID, mapping) then
+  begin
+    overridden := mapping.CustomTable or mapping.CustomId;
+    if not overridden then
+      for fieldMapping in mapping.Fields.Values do
+        if fieldMapping.CustomColumn then
+        begin
+          overridden := True;
+          break;
+        end;
+  end;
+
+  // Bold = Aurelius attribute override; italic = view
+  styles := [];
+  if overridden then
+    Include(styles, fsBold);
+  if table.IsView then
+    Include(styles, fsItalic);
+  grTables.FontStyles[1, ARow] := styles;
+end;
+
+procedure TfmAureliusExport.UpdateFieldRowStyle(ARow: integer);
+var
+  field: TGDAOField;
+  tableMapping: TTableMapping;
+  mapping: TFieldMapping;
+begin
+  if (ARow < 0) or (ARow >= grFields.RowCount) then Exit;
+  field := ObjectFromGrid<TGDAOField>(grFields, ARow);
+  if field = nil then Exit;
+  if FOptions.Tables.TryGetValue(field.OwnerTable.TID, tableMapping)
+    and tableMapping.Fields.TryGetValue(field.FID, mapping) and mapping.CustomColumn then
+    grFields.FontStyles[1, ARow] := [fsBold]
+  else
+    grFields.FontStyles[1, ARow] := [];
+end;
+
+procedure TfmAureliusExport.LoadColumnOverride;
+var
+  mapping: TFieldMapping;
+  props: TColumnPropOptions;
+  custom: boolean;
+begin
+  Inc(FLoading);
+  try
+    mapping := SelectedFieldMapping;
+    custom := (mapping <> nil) and mapping.CustomColumn;
+    chColumnDefault.Enabled := mapping <> nil;
+    chColumnDefault.Checked := not custom;
+    props := [];
+    if mapping = nil then
+      edColumnName.Text := ''
+    else
+    if custom then
+    begin
+      edColumnName.Text := mapping.ColumnName;
+      if edColumnName.Text = '' then
+        edColumnName.Text := SelectedField.FieldName;
+      props := mapping.ColumnProps;
+    end
+    else
+    begin
+      // show the calculated attribute
+      edColumnName.Text := SelectedField.FieldName;
+      props := FGenerator.DefaultColumnProps(SelectedField);
+    end;
+    chColumnRequired.Checked := cpRequired in props;
+    chColumnNoInsert.Checked := cpNoInsert in props;
+    chColumnNoUpdate.Checked := cpNoUpdate in props;
+    chColumnLazy.Checked := cpLazy in props;
+
+    edColumnName.Enabled := custom;
+    chColumnRequired.Enabled := custom;
+    chColumnNoInsert.Enabled := custom;
+    chColumnNoUpdate.Enabled := custom;
+    chColumnLazy.Enabled := custom;
+  finally
+    Dec(FLoading);
+  end;
+end;
+
+procedure TfmAureliusExport.SaveColumnOverride;
+var
+  mapping: TFieldMapping;
+  props: TColumnPropOptions;
+begin
+  mapping := SelectedFieldMapping;
+  if (mapping = nil) or not mapping.CustomColumn then Exit;
+
+  // the model field name is stored as empty, so a later rename in the model is followed
+  if edColumnName.Text = SelectedField.FieldName then
+    mapping.ColumnName := ''
+  else
+    mapping.ColumnName := Trim(edColumnName.Text);
+
+  props := [];
+  if chColumnRequired.Checked then
+    Include(props, cpRequired);
+  if chColumnNoInsert.Checked then
+    Include(props, cpNoInsert);
+  if chColumnNoUpdate.Checked then
+    Include(props, cpNoUpdate);
+  if chColumnLazy.Checked then
+    Include(props, cpLazy);
+  mapping.ColumnProps := props;
+end;
+
+procedure TfmAureliusExport.LoadTableAttributes;
+var
+  mapping: TTableMapping;
+  table: TGDAOTable;
+begin
+  Inc(FLoading);
+  try
+    table := SelectedTable;
+    mapping := SelectedTableMapping;
+    chTableAttrDefault.Enabled := mapping <> nil;
+    chIdDefault.Enabled := mapping <> nil;
+    if mapping = nil then
+    begin
+      chTableAttrDefault.Checked := True;
+      chIdDefault.Checked := True;
+      edTableAttrName.Text := '';
+      edTableAttrSchema.Text := '';
+      edTableAttrName.Enabled := False;
+      edTableAttrSchema.Enabled := False;
+      cbIdGenerator.ItemIndex := -1;
+      cbIdGenerator.Enabled := False;
+      clbIdFields.Items.Clear;
+      clbIdFields.Enabled := False;
+      edIdGeneratorClass.Text := '';
+      edIdGeneratorUnit.Text := '';
+      mmIdGeneratorCode.Lines.Text := '';
+      mmIdRetrieveCode.Lines.Text := '';
+      UpdateIdGeneratorClassEnabled;
+      Exit;
+    end;
+
+    chTableAttrDefault.Checked := not mapping.CustomTable;
+    if mapping.CustomTable and (mapping.TableName <> '') then
+      edTableAttrName.Text := mapping.TableName
+    else
+      edTableAttrName.Text := table.TableName;
+    if mapping.CustomTable then
+      edTableAttrSchema.Text := mapping.Schema
+    else
+      edTableAttrSchema.Text := '';
+    edTableAttrName.Enabled := mapping.CustomTable;
+    edTableAttrSchema.Enabled := mapping.CustomTable;
+
+    chIdDefault.Checked := not mapping.CustomId;
+    LoadIdFields(table);
+    cbIdGenerator.Enabled := mapping.CustomId;
+    clbIdFields.Enabled := mapping.CustomId;
+    edIdGeneratorClass.Text := mapping.IdGeneratorClass;
+    edIdGeneratorUnit.Text := mapping.IdGeneratorUnit;
+    mmIdGeneratorCode.Lines.Text := mapping.IdGeneratorCode;
+    mmIdRetrieveCode.Lines.Text := mapping.IdRetrieveCode;
+    UpdateIdGeneratorClassEnabled;
+  finally
+    Dec(FLoading);
+  end;
+end;
+
+procedure TfmAureliusExport.LoadIdFields(ATable: TGDAOTable);
+var
+  mapping: TTableMapping;
+  field: TGDAOField;
+  c: Integer;
+  idx: Integer;
+  pkCount: Integer;
+  generator: TIdGeneratorOption;
+begin
+  mapping := FGenerator.TableMapping(ATable);
+  clbIdFields.Items.BeginUpdate;
+  try
+    clbIdFields.Items.Clear;
+    pkCount := 0;
+    for c := 0 to ATable.Fields.Count - 1 do
+    begin
+      field := ATable.Fields[c];
+      idx := clbIdFields.Items.AddObject(field.FieldName, field);
+      if mapping.CustomId then
+        clbIdFields.Checked[idx] := mapping.IdFieldIds.IndexOf(field.FID) >= 0
+      else
+      if ATable.HasPrimaryKey and (ATable.PrimaryKeyIndex.IFields.FindByField(field) <> nil) then
+      begin
+        clbIdFields.Checked[idx] := True;
+        Inc(pkCount);
+      end;
+    end;
+  finally
+    clbIdFields.Items.EndUpdate;
+  end;
+
+  if mapping.CustomId then
+    generator := mapping.IdGenerator
+  else
+  begin
+    // Default Id shown as a starting point: primary key fields, generator as in RetrieveIdInfo
+    generator := igNone;
+    if pkCount = 1 then
+    begin
+      field := ATable.PrimaryKeyIndex.IFields[0].Field;
+      if field.DataType.Counter then
+        generator := igIdentityOrSequence
+      else
+      if field.DataType.NativeSubType = stGuid then
+        generator := igGuid
+      else
+      if (field.DataType.NativeDataType in [naInteger, naFloat])
+        and (mapping.SequenceName <> '') and not mapping.IgnoreSequence then
+        generator := igIdentityOrSequence;
+    end;
+  end;
+  cbIdGenerator.ItemIndex := Ord(generator);
+end;
+
+procedure TfmAureliusExport.SaveCustomId;
+var
+  mapping: TTableMapping;
+  c: Integer;
+begin
+  mapping := SelectedTableMapping;
+  if (mapping = nil) or not mapping.CustomId then Exit;
+
+  mapping.IdFieldIds.Clear;
+  for c := 0 to clbIdFields.Items.Count - 1 do
+    if clbIdFields.Checked[c] then
+      mapping.IdFieldIds.Add(TGDAOField(clbIdFields.Items.Objects[c]).FID);
+  if cbIdGenerator.ItemIndex >= 0 then
+    mapping.IdGenerator := TIdGeneratorOption(cbIdGenerator.ItemIndex)
+  else
+    mapping.IdGenerator := igNone;
+end;
+
+function TfmAureliusExport.CheckedIdFieldCount: Integer;
+var
+  c: Integer;
+begin
+  Result := 0;
+  for c := 0 to clbIdFields.Items.Count - 1 do
+    if clbIdFields.Checked[c] then
+      Inc(Result);
+end;
+
+procedure TfmAureliusExport.UpdateIdGeneratorClassEnabled;
+var
+  customId: Boolean;
+  composite: Boolean;
+  isCustom: Boolean;
+  idCount: Integer;
+begin
+  // Aurelius ignores the generator of a composite Id: the generator stays stored but is disabled
+  customId := (SelectedTableMapping <> nil) and SelectedTableMapping.CustomId;
+  idCount := CheckedIdFieldCount;
+  // A custom Id can start empty (e.g. a view has no primary key): ask for a field
+  if customId and (idCount = 0) then
+    lbIdFields.Caption := 'Id Fields: (select at least one)'
+  else
+    lbIdFields.Caption := 'Id Fields:';
+  composite := customId and (idCount > 1);
+  cbIdGenerator.Enabled := customId and not composite;
+  if composite then
+    cbIdGenerator.LabelCaption := 'Id Generator: (composite Id - none)'
+  else
+    cbIdGenerator.LabelCaption := 'Id Generator:';
+
+  // Class, unit and code only apply to the Custom generator. Unit + code: class generated in that unit;
+  // code only: class generated in the entity unit; unit only: existing class declared in that unit
+  isCustom := cbIdGenerator.Enabled and (cbIdGenerator.ItemIndex = Ord(igCustom));
+  edIdGeneratorClass.Enabled := isCustom;
+  edIdGeneratorUnit.Enabled := isCustom;
+  mmIdGeneratorCode.Enabled := isCustom;
+  mmIdGeneratorCode.ReadOnly := not isCustom;
+  mmIdRetrieveCode.Enabled := isCustom;
+  mmIdRetrieveCode.ReadOnly := not isCustom;
+  lbIdGeneratorCode.Enabled := isCustom;
 end;
 
 procedure TfmAureliusExport.MemoActionUpdate(Sender: TObject);
@@ -1202,12 +1742,12 @@ end;
 
 procedure TfmAureliusExport.mnSelectAllClick(Sender: TObject);
 begin
-  grTables.CheckAll(0);
+  SetVisibleTablesIncluded(True);
 end;
 
 procedure TfmAureliusExport.mnUnselectAllClick(Sender: TObject);
 begin
-  grTables.UnCheckAll(0);
+  SetVisibleTablesIncluded(False);
 end;
 
 procedure TfmAureliusExport.mnUpdateFromDiagramDefaultClick(Sender: TObject);
@@ -1240,9 +1780,10 @@ procedure TfmAureliusExport.ProcessSelectedTables(AProc: TProc<TGDAOTable>);
 var
   I: Integer;
 begin
-  for I := 0 to grTables.RowCount - 1 do
-    if not FGenerator.TableMapping(ObjectFromGrid<TGDAOTable>(grTables, I)).Excluded then
-      AProc(ObjectFromGrid<TGDAOTable>(grTables, I));
+  // All selected tables of the model, not only the rows shown by the filter
+  for I := 0 to FApp.DataDictionary.Tables.Count - 1 do
+    if not FGenerator.TableMapping(FApp.DataDictionary.Tables[I]).Excluded then
+      AProc(FApp.DataDictionary.Tables[I]);
 end;
 
 procedure TfmAureliusExport.SetMetadata(const Value: TAppMetaData);

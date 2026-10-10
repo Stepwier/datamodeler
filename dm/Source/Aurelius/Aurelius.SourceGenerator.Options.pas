@@ -24,11 +24,19 @@ type
 
   TNonNativePascalTypeConvertion = (nnptVariant, nnptString, nnptInteger);
 
+  TColumnPropOption = (cpRequired, cpNoInsert, cpNoUpdate, cpLazy);
+  TColumnPropOptions = set of TColumnPropOption;
+
+  TIdGeneratorOption = (igNone, igIdentityOrSequence, igGuid, igUuid38, igUuid36, igUuid32, igSmartGuid, igCustom);
+
   TFieldMapping = class
   private
     FPropertyName: string;
     FExcluded: boolean;
     FPropertyType: string;
+    FCustomColumn: boolean;
+    FColumnName: string;
+    FColumnProps: TColumnPropOptions;
     function GetDefaultNaming: boolean;
     function GetDefaultType: boolean;
   public
@@ -37,6 +45,11 @@ type
     property DefaultNaming: boolean read GetDefaultNaming;
     property PropertyType: string read FPropertyType write FPropertyType;
     property DefaultType: boolean read GetDefaultType;
+    // Column attribute override. When CustomColumn is False the attribute is calculated from the model.
+    // Empty ColumnName means the model field name. Size/Size2 always come from the model.
+    property CustomColumn: boolean read FCustomColumn write FCustomColumn;
+    property ColumnName: string read FColumnName write FColumnName;
+    property ColumnProps: TColumnPropOptions read FColumnProps write FColumnProps;
   end;
 
   TAssociationMapping = class
@@ -76,6 +89,16 @@ type
     FSequenceName: string;
     FModelNames: string;
     FClassUnitName: string;
+    FCustomTable: boolean;
+    FTableName: string;
+    FSchema: string;
+    FCustomId: boolean;
+    FIdFieldIds: TList<integer>;
+    FIdGenerator: TIdGeneratorOption;
+    FIdGeneratorClass: string;
+    FIdGeneratorUnit: string;
+    FIdGeneratorCode: string;
+    FIdRetrieveCode: string;
     function GetDefaultNaming: boolean;
     function GetIgnoreSequence: boolean;
     function GetDefaultModelNaming: boolean;
@@ -93,6 +116,21 @@ type
     property CustomContainer: boolean read FCustomContainer write FCustomContainer;
     property SequenceName: string read FSequenceName write FSequenceName;
     property IgnoreSequence: boolean read GetIgnoreSequence;
+    // Table attribute override. Empty TableName means the model table name; empty Schema is omitted.
+    property CustomTable: boolean read FCustomTable write FCustomTable;
+    property TableName: string read FTableName write FTableName;
+    property Schema: string read FSchema write FSchema;
+    // Id attribute override: Id fields by FieldId (FID) and generator.
+    property CustomId: boolean read FCustomId write FCustomId;
+    property IdFieldIds: TList<integer> read FIdFieldIds;
+    property IdGenerator: TIdGeneratorOption read FIdGenerator write FIdGenerator;
+    // igCustom only: generator class name (TAbstractGenerator descendant) and the unit declaring it
+    property IdGeneratorClass: string read FIdGeneratorClass write FIdGeneratorClass;
+    property IdGeneratorUnit: string read FIdGeneratorUnit write FIdGeneratorUnit;
+    // Bodies of GenerateId and RetrieveIdAfterInsert. When any is set, the class is generated in the entity unit
+    // (IdGeneratorUnit is then ignored); when both are empty, the class is an existing one declared in IdGeneratorUnit
+    property IdGeneratorCode: string read FIdGeneratorCode write FIdGeneratorCode;
+    property IdRetrieveCode: string read FIdRetrieveCode write FIdRetrieveCode;
   end;
 
   TSourceGeneratorOptions = class
@@ -266,10 +304,12 @@ end;
 constructor TTableMapping.Create;
 begin
   FFieldMappings := TObjectDictionary<integer, TFieldMapping>.Create([doOwnsValues]);
+  FIdFieldIds := TList<integer>.Create;
 end;
 
 destructor TTableMapping.Destroy;
 begin
+  FIdFieldIds.Free;
   FFieldMappings.Free;
   inherited;
 end;

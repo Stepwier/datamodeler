@@ -177,6 +177,15 @@ object frSQLServer2000Cfg: TfrSQLServer2000Cfg
         TabOrder = 0
         OnDropDown = cbODBCDriverDropDown
       end
+      object cbTrustServerCertificate: TCheckBox
+        Left = 6
+        Top = 56
+        Width = 299
+        Height = 17
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Trust server certificate'
+        TabOrder = 1
+      end
     end
   end
   object FDPhysMSSQLDriverLink1: TFDPhysMSSQLDriverLink

@@ -1,13 +1,13 @@
 object fmMenuRibbon: TfmMenuRibbon
   Left = 250
   Top = 200
-  ClientHeight = 716
+  ClientHeight = 573
   ClientWidth = 944
   Color = clBtnFace
   Constraints.MinWidth = 960
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -9
   Font.Name = 'Tahoma'
   Font.Style = []
   Icon.Data = {
@@ -13490,10 +13490,14 @@ object fmMenuRibbon: TfmMenuRibbon
   OnCreate = FormCreate
   OnShow = FormShow
   object gdipicon: TAdvGDIPPicture
-    Left = -16
-    Top = -16
-    Width = 16
-    Height = 16
+    Left = -13
+    Top = -13
+    Width = 13
+    Height = 13
+    Margins.Left = 2
+    Margins.Top = 2
+    Margins.Right = 2
+    Margins.Bottom = 2
     AutoSize = True
     Center = True
     Picture.Data = {
@@ -13519,13 +13523,17 @@ object fmMenuRibbon: TfmMenuRibbon
       A31D2E130000000049454E44AE426082}
     ImageTypes = []
     Visible = False
-    Version = '1.4.5.1'
+    Version = '1.4.5.2'
   end
   object AdvPager: TAdvToolBarPager
     Left = 0
     Top = 0
     Width = 944
-    Height = 149
+    Height = 119
+    Margins.Left = 2
+    Margins.Top = 2
+    Margins.Right = 2
+    Margins.Bottom = 2
     ActivePage = pgHome
     Caption.Height = 34
     CaptionButtons = [cbClose, cbMinimize, cbMaximize]
@@ -13710,13 +13718,21 @@ object fmMenuRibbon: TfmMenuRibbon
       Left = -1
       Top = 60
       Width = 946
-      Height = 89
+      Height = 59
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       Caption = 'Home'
       object AdvToolBar1: TAdvToolBar
         Left = 3
         Top = 3
-        Width = 155
-        Height = 83
+        Width = 193
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         Caption = 'Project'
         CaptionFont.Charset = DEFAULT_CHARSET
@@ -13738,8 +13754,12 @@ object fmMenuRibbon: TfmMenuRibbon
         object btGenerate: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 53
-          Height = 67
+          Width = 42
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Generate script'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -13931,6 +13951,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -13951,13 +13972,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btCheck: TAdvGlowButton
-          Left = 55
+          Left = 44
           Top = 2
           Width = 47
           Height = 67
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Check'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -14100,6 +14126,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -14120,13 +14147,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btProjectMerge: TAdvGlowButton
-          Left = 102
+          Left = 91
           Top = 2
           Width = 49
           Height = 67
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Merge'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -14258,6 +14290,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -14278,14 +14311,114 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
+          Layout = blGlyphTopAdjusted
+        end
+        object btProjectResync: TAdvGlowButton
+          Left = 140
+          Top = 2
+          Width = 49
+          Height = 67
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
+          Caption = 'Resync'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Segoe UI'
+          Font.Style = []
+          ImageIndex = 0
+          FocusType = ftHot
+          NotesFont.Charset = DEFAULT_CHARSET
+          NotesFont.Color = clWindowText
+          NotesFont.Height = -11
+          NotesFont.Name = 'Tahoma'
+          NotesFont.Style = []
+          ParentFont = False
+          Picture.Data = {
+            89504E470D0A1A0A0000000D4948445200000020000000200806000000737A7A
+            F4000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+            00097048597300000EC200000EC20115284A800000001874455874536F667477
+            617265005061696E742E4E455420352E312E378BD6F739000000B66558496649
+            492A000800000005001A010500010000004A0000001B01050001000000520000
+            0028010300010000000200000031010200100000005A00000069870400010000
+            006A00000000000000F2760100E8030000F2760100E80300005061696E742E4E
+            455420352E312E3700030000900700040000003032333001A003000100000001
+            00000005A0040001000000940000000000000002000100020004000000523938
+            000200070004000000303130300000000042A9A9E2BAF965F1000003A0494441
+            545847C5D7C98F56451405F05F838D1DC1A1A15D387484061136621C70084A34
+            31248E5189715AE8C638C4188831B273272E5868A20BE31057F61F207108CE06
+            4D8C04820AB4021D150C288303D0EAA79F9BF348517EDD0D04F4249557EFBE5B
+            B7EAD63D756FBD2E478E9331807EF446B617DF622B7EA9F48F09BA7133063351
+            0BEDAAFD956F83D19D541B395ADC86B51D261CAFADC3E2DA588DAE5A50A017CF
+            E38E4ABE1F5F61137E8CEC749C87B9985CE90FE221ECA9E463627A3C283D1AC2
+            92C47F340C4467A8C36E4CAF9547C319D8500C6EE1C90E9E8D85C91953726543
+            6C8F898978A718B4078B6AA523C0A2D868ECADCA1C075173E0093C95FEFE18F8
+            18533107B37036FA30A560FA1FF80D3FE17B6C8EC7BBB1006FE1A4E82EC3F2F4
+            0FC13939CFCD6AEF8BFC19ECAC627A386D67C68AAD46BE3773FD0B4F174A2B23
+            9B82351D8C1F6E5B131B62B3911FDC81260453B0BE60EA95D9FA53B130DFE762
+            26CEC469E8C109D16FE140BCFB2121D898ACF8217EC67C7C8209188EBD916601
+            8BF066FA6B7051FAB3928486739486B12D93B5E2C0C43C2785FDBD9881797168
+            1EB6E439987C2161599DBECBF0325EC1AD8D3006CAA3F4356EC0FD791FC66759
+            F45A7C5185A0959A714A12571DA20F8AB93A62021EC876B6F13E2EC7D5C9FDAF
+            E2413C9AB6B420EC37782436E0E29C8AD299FEFA18D6E8C7C3F8285BDC97347C
+            3E6E49659C80DF13EF1DC9829B23BB22E9FCBBD8BB066F6357B8B571BC050CC4
+            93AE94DAADF16247C8D6F0A03B44EDC359383763DBE1D196C2E675B1F1692123
+            3CB8BE92CDC448B16DDBB3E5CB8B18FF8A7D452B633C121BE3624EBC6A659B1A
+            4CABEAC24A5C9823B50F2B7053CAEE62DC9E5D6AF48762634CF457D56B372EC9
+            B79E4CF618DEC5E7781C2F569EB6F177D2F7F6907559087B6235DF21E8CA51B8
+            AA920F85B57D782FC9647516D71342B6F3ECCACE8D14E19A96902EC4B5E1911C
+            F11BA3F342C383D9B8B7F064232E88E1191507DA89F9F684663DBECC82B7E55B
+            A93B121B0DCAB47E4895ED495269E77CCF8F7CA022D6A61CBF2579DF9D980FE7
+            B925C7AFD1DF575C601614F2AD458D388886D9EDA218D599F0F5ECCEA531FE6C
+            887737EEC23D5944A3DF2AEA4BC7625462B472BCA2C86E07F012DE28F4466B3B
+            33D658E5B84E44E35D486627B14C4D256C2E247F26FEBB92F58EEA4222956D55
+            B1DAE37E25EB84FFF552DA60B46BF9D2637D2DAF3950A217CFE1CE4AFE9FFC98
+            9438AEBF66878BEE149DD78EE0E7B4BB36D209638560341CD3DFF37F003436A2
+            403567B2490000000049454E44AE426082}
+          Rounded = False
+          Transparent = True
+          TabOrder = 3
+          Appearance.BorderColor = clWhite
+          Appearance.BorderColorHot = 16246477
+          Appearance.BorderColorDown = 15187578
+          Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
+          Appearance.Color = clWhite
+          Appearance.ColorTo = clNone
+          Appearance.ColorChecked = 15187578
+          Appearance.ColorCheckedTo = clNone
+          Appearance.ColorDisabled = clSilver
+          Appearance.ColorDisabledTo = clNone
+          Appearance.ColorDown = 15187578
+          Appearance.ColorDownTo = clNone
+          Appearance.ColorHot = 16246477
+          Appearance.ColorHotTo = clNone
+          Appearance.ColorMirror = clNone
+          Appearance.ColorMirrorTo = clNone
+          Appearance.ColorMirrorHot = clNone
+          Appearance.ColorMirrorHotTo = clNone
+          Appearance.ColorMirrorDown = clNone
+          Appearance.ColorMirrorDownTo = clNone
+          Appearance.ColorMirrorChecked = clNone
+          Appearance.ColorMirrorCheckedTo = clNone
+          Appearance.ColorMirrorDisabled = clNone
+          Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
       end
       object AdvToolBar3: TAdvToolBar
-        Left = 435
+        Left = 473
         Top = 3
-        Width = 151
-        Height = 83
+        Width = 132
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         Caption = 'Versions'
         CaptionFont.Charset = DEFAULT_CHARSET
@@ -14305,10 +14438,14 @@ object fmMenuRibbon: TfmMenuRibbon
         ParentOptionPicture = True
         ToolBarIndex = 2
         object btVersionArchive: TAdvGlowButton
-          Left = 53
+          Left = 43
           Top = 2
-          Width = 47
-          Height = 67
+          Width = 38
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Archive'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -14446,6 +14583,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -14466,13 +14604,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btVersionCompare: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 51
-          Height = 67
+          Width = 41
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Compare'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -14582,6 +14725,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -14602,14 +14746,19 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
           DropDownPosition = dpBottom
         end
         object btVersionManage: TAdvGlowButton
-          Left = 100
+          Left = 81
           Top = 2
           Width = 47
           Height = 67
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Manage'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -14736,6 +14885,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -14756,14 +14906,19 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
       end
       object AdvToolBar4: TAdvToolBar
-        Left = 161
+        Left = 199
         Top = 3
         Width = 271
-        Height = 83
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         AutoPositionControls = False
         AutoSize = False
@@ -14785,10 +14940,14 @@ object fmMenuRibbon: TfmMenuRibbon
         ParentOptionPicture = True
         ToolBarIndex = 1
         object btNewProcedure: TAdvGlowButton
-          Left = 123
+          Left = 98
           Top = 2
-          Width = 90
-          Height = 22
+          Width = 72
+          Height = 18
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Procedure'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -14841,6 +15000,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -14861,14 +15021,19 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphLeftAdjusted
           MaxButtonSizeState = bsLabel
         end
         object btNewTable: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 47
-          Height = 67
+          Width = 38
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Table'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -14939,6 +15104,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -14959,13 +15125,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btNewRelationship: TAdvGlowButton
-          Left = 49
+          Left = 39
           Top = 2
-          Width = 74
-          Height = 67
+          Width = 59
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Relationship'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -15032,6 +15203,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -15052,13 +15224,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btNewObject: TAdvGlowButton
-          Left = 123
-          Top = 46
-          Width = 90
-          Height = 22
+          Left = 98
+          Top = 37
+          Width = 72
+          Height = 18
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Object'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -15119,6 +15296,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -15139,6 +15317,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphLeftAdjusted
           MaxButtonSizeState = bsLabel
           DropDownButton = True
@@ -15146,10 +15325,14 @@ object fmMenuRibbon: TfmMenuRibbon
           DropDownMenu = pmObjects
         end
         object btNewView: TAdvGlowButton
-          Left = 123
-          Top = 24
-          Width = 90
-          Height = 22
+          Left = 98
+          Top = 19
+          Width = 72
+          Height = 18
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'View'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -15204,6 +15387,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -15224,14 +15408,19 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphLeftAdjusted
           MaxButtonSizeState = bsLabel
         end
         object btProjectDomains: TAdvGlowButton
-          Left = 215
+          Left = 172
           Top = 2
-          Width = 53
-          Height = 67
+          Width = 42
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Domains'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -15356,6 +15545,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -15376,14 +15566,19 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
       end
       object AdvToolBar5: TAdvToolBar
-        Left = 589
+        Left = 608
         Top = 3
         Width = 126
-        Height = 83
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         Caption = 'Show/Hide'
         CaptionFont.Charset = DEFAULT_CHARSET
@@ -15404,9 +15599,13 @@ object fmMenuRibbon: TfmMenuRibbon
         ToolBarIndex = 3
         object btViewMessages: TAdvGlowButton
           Left = 2
-          Top = 2
-          Width = 120
-          Height = 22
+          Top = 24
+          Width = 96
+          Height = 18
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Messages Window'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -15466,6 +15665,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -15486,15 +15686,20 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphLeftAdjusted
           Style = bsCheck
           MaxButtonSizeState = bsLabel
         end
         object btViewExplorer: TAdvGlowButton
           Left = 2
-          Top = 24
+          Top = 2
           Width = 120
           Height = 22
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Project Explorer'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -15558,6 +15763,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -15578,6 +15784,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphLeftAdjusted
           Style = bsCheck
           MaxButtonSizeState = bsLabel
@@ -15588,13 +15795,21 @@ object fmMenuRibbon: TfmMenuRibbon
       Left = -1
       Top = 60
       Width = 946
-      Height = 89
+      Height = 59
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       Caption = 'Tools'
       object AdvToolBar7: TAdvToolBar
-        Left = 234
+        Left = 211
         Top = 3
-        Width = 134
-        Height = 83
+        Width = 121
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         Caption = 'General'
         CaptionFont.Charset = DEFAULT_CHARSET
@@ -15616,8 +15831,12 @@ object fmMenuRibbon: TfmMenuRibbon
         object btToolsConnections: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 66
-          Height = 67
+          Width = 53
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Connections'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -15726,6 +15945,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -15746,13 +15966,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btToolsConversionMaps: TAdvGlowButton
-          Left = 68
+          Left = 55
           Top = 2
           Width = 62
           Height = 67
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Conversion Maps'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -15884,6 +16109,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -15904,14 +16130,19 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
       end
       object AdvToolBar8: TAdvToolBar
         Left = 3
         Top = 3
-        Width = 153
-        Height = 83
+        Width = 143
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         Caption = 'Project'
         CaptionFont.Charset = DEFAULT_CHARSET
@@ -15933,8 +16164,12 @@ object fmMenuRibbon: TfmMenuRibbon
         object btProjectConvert: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 51
-          Height = 67
+          Width = 41
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Convert'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -16080,6 +16315,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -16100,13 +16336,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btProjectSettings: TAdvGlowButton
-          Left = 53
+          Left = 43
           Top = 2
           Width = 48
           Height = 67
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Settings'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -16256,6 +16497,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -16276,13 +16518,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btScripting: TAdvGlowButton
-          Left = 101
+          Left = 91
           Top = 2
           Width = 48
           Height = 67
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Scripting'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -16419,6 +16666,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -16439,14 +16687,19 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
       end
       object AdvToolBar6: TAdvToolBar
-        Left = 159
+        Left = 149
         Top = 3
-        Width = 72
-        Height = 83
+        Width = 59
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         Caption = 'Export'
         CaptionFont.Charset = DEFAULT_CHARSET
@@ -16468,8 +16721,12 @@ object fmMenuRibbon: TfmMenuRibbon
         object btProjectAureliusExport: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 66
-          Height = 67
+          Width = 53
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'TMS Aurelius'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -16623,6 +16880,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -16643,6 +16901,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
       end
@@ -16651,13 +16910,21 @@ object fmMenuRibbon: TfmMenuRibbon
       Left = -1
       Top = 60
       Width = 946
-      Height = 89
+      Height = 59
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       Caption = 'Help'
       object toolbarDM: TAdvToolBar
         Left = 3
         Top = 3
-        Width = 219
-        Height = 83
+        Width = 186
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         Caption = 'Data Modeler'
         CaptionFont.Charset = DEFAULT_CHARSET
@@ -16677,10 +16944,14 @@ object fmMenuRibbon: TfmMenuRibbon
         ParentOptionPicture = True
         ToolBarIndex = 0
         object btAbout: TAdvGlowButton
-          Left = 162
+          Left = 140
           Top = 2
-          Width = 53
-          Height = 67
+          Width = 42
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'About'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -16892,6 +17163,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -16912,13 +17184,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btManual: TAdvGlowButton
-          Left = 56
+          Left = 45
           Top = 2
-          Width = 53
-          Height = 67
+          Width = 42
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'User Manual'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -17084,6 +17361,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -17104,13 +17382,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btHomePage: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 54
-          Height = 67
+          Width = 43
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Web Site'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -17295,6 +17578,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -17315,13 +17599,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btWebUpdate: TAdvGlowButton
-          Left = 109
+          Left = 87
           Top = 2
           Width = 53
           Height = 67
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Update'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -17490,6 +17779,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -17510,6 +17800,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
       end
@@ -17518,13 +17809,21 @@ object fmMenuRibbon: TfmMenuRibbon
       Left = -1
       Top = 60
       Width = 946
-      Height = 89
+      Height = 59
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       Caption = 'Design'
       object AdvToolBar2: TAdvToolBar
         Left = 3
         Top = 3
-        Width = 262
-        Height = 83
+        Width = 253
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         Caption = 'Insert'
         CaptionFont.Charset = DEFAULT_CHARSET
@@ -17546,8 +17845,12 @@ object fmMenuRibbon: TfmMenuRibbon
         object btDiagAddTable: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 47
-          Height = 67
+          Width = 38
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Table'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -17618,6 +17921,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -17638,13 +17942,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btDiagAddIdRel: TAdvGlowButton
-          Left = 49
+          Left = 40
           Top = 2
           Width = 71
           Height = 67
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Relationship'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -17711,6 +18020,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -17731,13 +18041,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btDiagAddNote: TAdvGlowButton
-          Left = 120
-          Top = 2
+          Left = 111
+          Top = 24
           Width = 138
           Height = 22
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Note'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -17801,6 +18116,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -17821,14 +18137,19 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphLeftAdjusted
           MaxButtonSizeState = bsLabel
         end
         object btDiagAddNonIDRel: TAdvGlowButton
-          Left = 120
-          Top = 24
+          Left = 111
+          Top = 2
           Width = 138
           Height = 22
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Non-ID Relationship'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -17866,6 +18187,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -17886,15 +18208,20 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphLeftAdjusted
           MaxButtonSizeState = bsLabel
         end
       end
       object AdvToolBar9: TAdvToolBar
-        Left = 729
+        Left = 702
         Top = 3
-        Width = 147
-        Height = 83
+        Width = 138
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         Caption = 'Output'
         CaptionFont.Charset = DEFAULT_CHARSET
@@ -17916,8 +18243,12 @@ object fmMenuRibbon: TfmMenuRibbon
         object btDiagPreview: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 47
-          Height = 67
+          Width = 38
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Print Preview'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -18041,6 +18372,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -18061,13 +18393,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btDiagExport: TAdvGlowButton
-          Left = 96
+          Left = 87
           Top = 2
           Width = 47
           Height = 67
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Export Image'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -18192,6 +18529,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -18212,13 +18550,18 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
         object btDiagPrint: TAdvGlowButton
-          Left = 49
+          Left = 40
           Top = 2
           Width = 47
           Height = 67
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Print'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -18319,6 +18662,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -18339,14 +18683,19 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphTopAdjusted
         end
       end
       object barPageSetup: TAdvToolBar
-        Left = 879
+        Left = 843
         Top = 3
-        Width = 116
-        Height = 83
+        Width = 103
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         Caption = 'Page Setup'
         CaptionFont.Charset = DEFAULT_CHARSET
@@ -18368,8 +18717,12 @@ object fmMenuRibbon: TfmMenuRibbon
         object btDiagPageOrientation: TAdvOfficeToolSelector
           Left = 2
           Top = 2
-          Width = 63
-          Height = 67
+          Width = 50
+          Height = 54
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Orientation'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -18482,6 +18835,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -18502,6 +18856,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           BorderDropDownColor = clSilver
           CaptionAppearance.BorderColor = clNone
           CaptionAppearance.Color = 15915714
@@ -18510,6 +18865,7 @@ object fmMenuRibbon: TfmMenuRibbon
           CaptionAppearance.TextColor = clWindowText
           CaptionAppearance.TextColorHot = clBlack
           CaptionAppearance.TextColorDown = clBlack
+          CaptionAppearance.ButtonAppearance.BorderColorDisabled = clGray
           CaptionAppearance.ButtonAppearance.Color = clWhite
           CaptionAppearance.ButtonAppearance.ColorTo = clWhite
           CaptionAppearance.ButtonAppearance.ColorChecked = 16111818
@@ -18530,6 +18886,7 @@ object fmMenuRibbon: TfmMenuRibbon
           CaptionAppearance.ButtonAppearance.ColorMirrorCheckedTo = 16768988
           CaptionAppearance.ButtonAppearance.ColorMirrorDisabled = 11974326
           CaptionAppearance.ButtonAppearance.ColorMirrorDisabledTo = 15921906
+          CaptionAppearance.ButtonAppearance.TextColorDisabled = clGray
           DragGripAppearance.BorderColor = clGray
           DragGripAppearance.Color = 16117985
           DragGripAppearance.ColorTo = 16372402
@@ -18554,6 +18911,7 @@ object fmMenuRibbon: TfmMenuRibbon
           SelectionAppearance.BorderColorHot = 10079963
           SelectionAppearance.BorderColorDown = 4548219
           SelectionAppearance.BorderColorChecked = 4548219
+          SelectionAppearance.BorderColorDisabled = clGray
           SelectionAppearance.Color = 15465983
           SelectionAppearance.ColorTo = 11267071
           SelectionAppearance.ColorChecked = 11918331
@@ -18604,10 +18962,14 @@ object fmMenuRibbon: TfmMenuRibbon
           UIStyle = tsOffice2016White
         end
         object btDiagPaperSize: TAdvOfficeToolSelector
-          Left = 65
+          Left = 52
           Top = 2
           Width = 47
           Height = 67
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Size'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -18681,6 +19043,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -18701,6 +19064,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           BorderDropDownColor = clSilver
           CaptionAppearance.BorderColor = clNone
           CaptionAppearance.Color = 15915714
@@ -18709,6 +19073,7 @@ object fmMenuRibbon: TfmMenuRibbon
           CaptionAppearance.TextColor = clWindowText
           CaptionAppearance.TextColorHot = clBlack
           CaptionAppearance.TextColorDown = clBlack
+          CaptionAppearance.ButtonAppearance.BorderColorDisabled = clGray
           CaptionAppearance.ButtonAppearance.Color = clWhite
           CaptionAppearance.ButtonAppearance.ColorTo = clWhite
           CaptionAppearance.ButtonAppearance.ColorChecked = 16111818
@@ -18729,6 +19094,7 @@ object fmMenuRibbon: TfmMenuRibbon
           CaptionAppearance.ButtonAppearance.ColorMirrorCheckedTo = 16768988
           CaptionAppearance.ButtonAppearance.ColorMirrorDisabled = 11974326
           CaptionAppearance.ButtonAppearance.ColorMirrorDisabledTo = 15921906
+          CaptionAppearance.ButtonAppearance.TextColorDisabled = clGray
           DragGripAppearance.BorderColor = clGray
           DragGripAppearance.Color = 16117985
           DragGripAppearance.ColorTo = 16372402
@@ -18753,6 +19119,7 @@ object fmMenuRibbon: TfmMenuRibbon
           SelectionAppearance.BorderColorHot = 10079963
           SelectionAppearance.BorderColorDown = 4548219
           SelectionAppearance.BorderColorChecked = 4548219
+          SelectionAppearance.BorderColorDisabled = clGray
           SelectionAppearance.Color = 15465983
           SelectionAppearance.ColorTo = 11267071
           SelectionAppearance.ColorChecked = 11918331
@@ -18804,10 +19171,14 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object barDiagShape: TAdvToolBar
-        Left = 533
+        Left = 506
         Top = 3
         Width = 193
-        Height = 83
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         AutoArrangeButtons = False
         AutoPositionControls = False
@@ -18830,10 +19201,14 @@ object fmMenuRibbon: TfmMenuRibbon
         ParentOptionPicture = True
         ToolBarIndex = 4
         object btDiagFontName: TAdvOfficeFontSelector
-          Left = 8
-          Top = 10
-          Width = 127
-          Height = 19
+          Left = 6
+          Top = 8
+          Width = 102
+          Height = 15
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Button.Color = clWhite
           Button.ColorTo = clNone
           Button.ColorHot = 15917525
@@ -18905,10 +19280,14 @@ object fmMenuRibbon: TfmMenuRibbon
           UIStyle = tsOffice2016White
         end
         object btDiagFontSize: TAdvOfficeFontSizeSelector
-          Left = 141
-          Top = 10
-          Width = 44
-          Height = 19
+          Left = 113
+          Top = 8
+          Width = 35
+          Height = 15
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Button.Color = clWhite
           Button.ColorTo = clNone
           Button.ColorHot = 15917525
@@ -18945,10 +19324,14 @@ object fmMenuRibbon: TfmMenuRibbon
           UIStyle = tsOffice2016White
         end
         object btDiagShapeColor: TAdvOfficeColorSelector
-          Left = 8
-          Top = 46
-          Width = 82
-          Height = 22
+          Left = 6
+          Top = 37
+          Width = 66
+          Height = 18
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Fill'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -18995,6 +19378,7 @@ object fmMenuRibbon: TfmMenuRibbon
           CaptionAppearance.TextColor = clWindowText
           CaptionAppearance.TextColorHot = clBlack
           CaptionAppearance.TextColorDown = clBlack
+          CaptionAppearance.ButtonAppearance.BorderColorDisabled = clGray
           CaptionAppearance.ButtonAppearance.Color = clWhite
           CaptionAppearance.ButtonAppearance.ColorTo = clWhite
           CaptionAppearance.ButtonAppearance.ColorChecked = 16111818
@@ -19015,6 +19399,7 @@ object fmMenuRibbon: TfmMenuRibbon
           CaptionAppearance.ButtonAppearance.ColorMirrorCheckedTo = 16768988
           CaptionAppearance.ButtonAppearance.ColorMirrorDisabled = 11974326
           CaptionAppearance.ButtonAppearance.ColorMirrorDisabledTo = 15921906
+          CaptionAppearance.ButtonAppearance.TextColorDisabled = clGray
           ColorDialog = ColorDialog1
           DragGripAppearance.BorderColor = clGray
           DragGripAppearance.Color = 16117985
@@ -19036,6 +19421,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -19056,6 +19442,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           SelectedColor = clMenuHighlight
           ShowRGBHint = True
           BorderDropDownColor = clSilver
@@ -19064,6 +19451,7 @@ object fmMenuRibbon: TfmMenuRibbon
           SelectionAppearance.BorderColorHot = 10079963
           SelectionAppearance.BorderColorDown = 4548219
           SelectionAppearance.BorderColorChecked = 4548219
+          SelectionAppearance.BorderColorDisabled = clGray
           SelectionAppearance.Color = 15465983
           SelectionAppearance.ColorTo = 11267071
           SelectionAppearance.ColorChecked = 11918331
@@ -19358,10 +19746,14 @@ object fmMenuRibbon: TfmMenuRibbon
           UIStyle = tsOffice2016White
         end
         object btDiagTextColor: TAdvOfficeColorSelector
-          Left = 103
-          Top = 46
-          Width = 82
-          Height = 22
+          Left = 82
+          Top = 37
+          Width = 66
+          Height = 18
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Text'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -19408,6 +19800,7 @@ object fmMenuRibbon: TfmMenuRibbon
           CaptionAppearance.TextColor = clWindowText
           CaptionAppearance.TextColorHot = clBlack
           CaptionAppearance.TextColorDown = clBlack
+          CaptionAppearance.ButtonAppearance.BorderColorDisabled = clGray
           CaptionAppearance.ButtonAppearance.Color = clWhite
           CaptionAppearance.ButtonAppearance.ColorTo = clWhite
           CaptionAppearance.ButtonAppearance.ColorChecked = 16111818
@@ -19428,6 +19821,7 @@ object fmMenuRibbon: TfmMenuRibbon
           CaptionAppearance.ButtonAppearance.ColorMirrorCheckedTo = 16768988
           CaptionAppearance.ButtonAppearance.ColorMirrorDisabled = 11974326
           CaptionAppearance.ButtonAppearance.ColorMirrorDisabledTo = 15921906
+          CaptionAppearance.ButtonAppearance.TextColorDisabled = clGray
           ColorDialog = ColorDialog1
           DragGripAppearance.BorderColor = clGray
           DragGripAppearance.Color = 16117985
@@ -19449,6 +19843,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -19469,6 +19864,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           SelectedColor = clMenuHighlight
           ShowRGBHint = True
           BorderDropDownColor = clSilver
@@ -19477,6 +19873,7 @@ object fmMenuRibbon: TfmMenuRibbon
           SelectionAppearance.BorderColorHot = 10079963
           SelectionAppearance.BorderColorDown = 4548219
           SelectionAppearance.BorderColorChecked = 4548219
+          SelectionAppearance.BorderColorDisabled = clGray
           SelectionAppearance.Color = 15465983
           SelectionAppearance.ColorTo = 11267071
           SelectionAppearance.ColorChecked = 11918331
@@ -19772,10 +20169,14 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object AdvToolBar10: TAdvToolBar
-        Left = 268
+        Left = 259
         Top = 3
         Width = 89
-        Height = 83
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         Caption = 'Editing'
         CaptionFont.Charset = DEFAULT_CHARSET
@@ -19796,9 +20197,13 @@ object fmMenuRibbon: TfmMenuRibbon
         ToolBarIndex = 1
         object btDiagFind: TAdvGlowButton
           Left = 2
-          Top = 2
-          Width = 83
-          Height = 22
+          Top = 24
+          Width = 66
+          Height = 18
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Find'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -19866,6 +20271,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -19886,15 +20292,20 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           GroupIndex = 1
           Layout = blGlyphLeftAdjusted
           MaxButtonSizeState = bsLabel
         end
         object btDiagDuplicate: TAdvGlowButton
           Left = 2
-          Top = 24
+          Top = 2
           Width = 83
           Height = 22
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Duplicate'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -19952,6 +20363,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -19972,15 +20384,20 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphLeftAdjusted
           MaxButtonSizeState = bsLabel
         end
       end
       object AdvToolBar11: TAdvToolBar
-        Left = 434
+        Left = 425
         Top = 3
-        Width = 96
-        Height = 83
+        Width = 78
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         Caption = 'View'
         CaptionFont.Charset = DEFAULT_CHARSET
@@ -20002,8 +20419,12 @@ object fmMenuRibbon: TfmMenuRibbon
         object btDiagNavigator: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 90
-          Height = 22
+          Width = 72
+          Height = 18
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Navigator'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -20065,6 +20486,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -20085,6 +20507,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Down = True
           GroupIndex = 1
           Layout = blGlyphLeftAdjusted
@@ -20092,10 +20515,14 @@ object fmMenuRibbon: TfmMenuRibbon
         end
       end
       object AdvToolBar12: TAdvToolBar
-        Left = 360
+        Left = 351
         Top = 3
         Width = 71
-        Height = 83
+        Height = 53
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         AllowFloating = True
         AutoArrangeButtons = False
         AutoPositionControls = False
@@ -20119,9 +20546,13 @@ object fmMenuRibbon: TfmMenuRibbon
         ToolBarIndex = 2
         object btDiagFitAll: TAdvGlowButton
           Left = 2
-          Top = 24
-          Width = 65
-          Height = 22
+          Top = 19
+          Width = 52
+          Height = 18
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = 'Fit All'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -20185,6 +20616,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -20205,14 +20637,19 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphLeftAdjusted
           MaxButtonSizeState = bsLabel
         end
         object btDiagZoom100: TAdvGlowButton
           Left = 2
           Top = 2
-          Width = 65
-          Height = 22
+          Width = 52
+          Height = 18
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Caption = '100%'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -20275,6 +20712,7 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.BorderColorHot = 16246477
           Appearance.BorderColorDown = 15187578
           Appearance.BorderColorChecked = 15187578
+          Appearance.BorderColorDisabled = clGray
           Appearance.Color = clWhite
           Appearance.ColorTo = clNone
           Appearance.ColorChecked = 15187578
@@ -20295,14 +20733,19 @@ object fmMenuRibbon: TfmMenuRibbon
           Appearance.ColorMirrorCheckedTo = clNone
           Appearance.ColorMirrorDisabled = clNone
           Appearance.ColorMirrorDisabledTo = clNone
+          Appearance.TextColorDisabled = clGray
           Layout = blGlyphLeftAdjusted
           MaxButtonSizeState = bsLabel
         end
         object edDiagZoom: TDgrZoomSelector
           Left = 2
-          Top = 50
-          Width = 62
-          Height = 19
+          Top = 40
+          Width = 50
+          Height = 15
+          Margins.Left = 2
+          Margins.Top = 2
+          Margins.Right = 2
+          Margins.Bottom = 2
           Button.Color = 16572875
           Button.ColorTo = 14722429
           Button.ColorHot = 14483455
@@ -20325,9 +20768,13 @@ object fmMenuRibbon: TfmMenuRibbon
     end
     object AdvShapeButton1: TAdvShapeButton
       Left = 0
-      Top = 37
-      Width = 55
-      Height = 24
+      Top = 30
+      Width = 44
+      Height = 19
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       Appearance.Shape = bsOrb
       Appearance.BorderColor = clWhite
       Appearance.BorderColorHot = clWhite
@@ -20543,15 +20990,23 @@ object fmMenuRibbon: TfmMenuRibbon
     end
     object AdvQuickAccessToolBar: TAdvQuickAccessToolBar
       Left = 5
-      Top = 9
-      Width = 143
-      Height = 25
+      Top = 14
+      Width = 140
+      Height = 20
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       ShowCustomizeOption = False
       object btQuickSave: TAdvGlowButton
         Left = 78
-        Top = 2
+        Top = 0
         Width = 22
         Height = 20
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -11
@@ -20611,6 +21066,7 @@ object fmMenuRibbon: TfmMenuRibbon
         Appearance.BorderColorHot = 16246477
         Appearance.BorderColorDown = 15187578
         Appearance.BorderColorChecked = 15187578
+        Appearance.BorderColorDisabled = clGray
         Appearance.Color = clWhite
         Appearance.ColorTo = clNone
         Appearance.ColorChecked = 15187578
@@ -20631,12 +21087,17 @@ object fmMenuRibbon: TfmMenuRibbon
         Appearance.ColorMirrorCheckedTo = clNone
         Appearance.ColorMirrorDisabled = clNone
         Appearance.ColorMirrorDisabledTo = clNone
+        Appearance.TextColorDisabled = clGray
       end
       object btQuickOpen: TAdvGlowButton
         Left = 56
-        Top = 2
+        Top = 0
         Width = 22
         Height = 20
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -11
@@ -20694,6 +21155,7 @@ object fmMenuRibbon: TfmMenuRibbon
         Appearance.BorderColorHot = 16246477
         Appearance.BorderColorDown = 15187578
         Appearance.BorderColorChecked = 15187578
+        Appearance.BorderColorDisabled = clGray
         Appearance.Color = clWhite
         Appearance.ColorTo = clNone
         Appearance.ColorChecked = 15187578
@@ -20714,12 +21176,17 @@ object fmMenuRibbon: TfmMenuRibbon
         Appearance.ColorMirrorCheckedTo = clNone
         Appearance.ColorMirrorDisabled = clNone
         Appearance.ColorMirrorDisabledTo = clNone
+        Appearance.TextColorDisabled = clGray
       end
       object btQuickNew: TAdvGlowButton
         Left = 27
-        Top = 2
+        Top = 0
         Width = 29
         Height = 20
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -11
@@ -20768,6 +21235,7 @@ object fmMenuRibbon: TfmMenuRibbon
         Appearance.BorderColorHot = 16246477
         Appearance.BorderColorDown = 15187578
         Appearance.BorderColorChecked = 15187578
+        Appearance.BorderColorDisabled = clGray
         Appearance.Color = clWhite
         Appearance.ColorTo = clNone
         Appearance.ColorChecked = 15187578
@@ -20788,15 +21256,20 @@ object fmMenuRibbon: TfmMenuRibbon
         Appearance.ColorMirrorCheckedTo = clNone
         Appearance.ColorMirrorDisabled = clNone
         Appearance.ColorMirrorDisabledTo = clNone
+        Appearance.TextColorDisabled = clGray
         DropDownButton = True
         DropDownSplit = False
         DropDownMenu = pmNew
       end
       object btQuickClose: TAdvGlowButton
         Left = 100
-        Top = 2
+        Top = 0
         Width = 22
         Height = 20
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -11
@@ -20849,6 +21322,7 @@ object fmMenuRibbon: TfmMenuRibbon
         Appearance.BorderColorHot = 16246477
         Appearance.BorderColorDown = 15187578
         Appearance.BorderColorChecked = 15187578
+        Appearance.BorderColorDisabled = clGray
         Appearance.Color = clWhite
         Appearance.ColorTo = clNone
         Appearance.ColorChecked = 15187578
@@ -20869,14 +21343,19 @@ object fmMenuRibbon: TfmMenuRibbon
         Appearance.ColorMirrorCheckedTo = clNone
         Appearance.ColorMirrorDisabled = clNone
         Appearance.ColorMirrorDisabledTo = clNone
+        Appearance.TextColorDisabled = clGray
       end
     end
   end
   object sbBar: TAdvOfficeStatusBar
     Left = 0
-    Top = 697
+    Top = 558
     Width = 944
-    Height = 19
+    Height = 15
+    Margins.Left = 2
+    Margins.Top = 2
+    Margins.Right = 2
+    Margins.Bottom = 2
     AnchorHint = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -21024,6 +21503,7 @@ object fmMenuRibbon: TfmMenuRibbon
     CompactGlowButtonAppearance.BorderColorHot = 5819121
     CompactGlowButtonAppearance.BorderColorDown = 3181250
     CompactGlowButtonAppearance.BorderColorChecked = 3181250
+    CompactGlowButtonAppearance.BorderColorDisabled = clGray
     CompactGlowButtonAppearance.Color = 16643823
     CompactGlowButtonAppearance.ColorTo = 15784647
     CompactGlowButtonAppearance.ColorChecked = 14285309
@@ -21049,6 +21529,7 @@ object fmMenuRibbon: TfmMenuRibbon
     CompactGlowButtonAppearance.GradientDown = ggVertical
     CompactGlowButtonAppearance.GradientMirrorDown = ggVertical
     CompactGlowButtonAppearance.GradientChecked = ggVertical
+    CompactGlowButtonAppearance.TextColorDisabled = clGray
     DockColor.Color = clWhite
     DockColor.ColorTo = clWhite
     DockColor.Direction = gdHorizontal
@@ -21063,6 +21544,7 @@ object fmMenuRibbon: TfmMenuRibbon
     GlowButtonAppearance.BorderColorHot = 16246477
     GlowButtonAppearance.BorderColorDown = 15187578
     GlowButtonAppearance.BorderColorChecked = 15187578
+    GlowButtonAppearance.BorderColorDisabled = clGray
     GlowButtonAppearance.Color = clWhite
     GlowButtonAppearance.ColorTo = clNone
     GlowButtonAppearance.ColorChecked = 15187578
@@ -21083,6 +21565,7 @@ object fmMenuRibbon: TfmMenuRibbon
     GlowButtonAppearance.ColorMirrorCheckedTo = clNone
     GlowButtonAppearance.ColorMirrorDisabled = clNone
     GlowButtonAppearance.ColorMirrorDisabledTo = clNone
+    GlowButtonAppearance.TextColorDisabled = clGray
     GroupAppearance.Background = 16754739
     GroupAppearance.BorderColor = 10443520
     GroupAppearance.Color = clNavy
@@ -22393,7 +22876,6 @@ object fmMenuRibbon: TfmMenuRibbon
     ButtonAppearance.BorderColorHot = 15917525
     ButtonAppearance.BorderColorDown = 14925219
     ButtonAppearance.BorderColorChecked = 15914434
-    ButtonAppearance.BorderColorDisabled = 13948116
     ButtonAppearance.Color = clWhite
     ButtonAppearance.ColorTo = clNone
     ButtonAppearance.ColorChecked = 15914434
@@ -22419,6 +22901,7 @@ object fmMenuRibbon: TfmMenuRibbon
     ButtonAppearance.GradientDown = ggVertical
     ButtonAppearance.GradientMirrorDown = ggVertical
     ButtonAppearance.GradientChecked = ggVertical
+    ButtonAppearance.TextColorDisabled = clGray
     Style = psOffice2016White
     Left = 448
     Top = 152

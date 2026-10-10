@@ -48,7 +48,7 @@ object fmAureliusExport: TfmAureliusExport
     Text = ''
     Visible = True
     OnChange = SaveProperty
-    Version = '1.7.2.2'
+    Version = '1.7.2.3'
     ButtonStyle = bsButton
     ButtonWidth = 18
     Flat = False
@@ -87,11 +87,11 @@ object fmAureliusExport: TfmAureliusExport
           Left = 10
           Top = 35
           Width = 145
-          Height = 21
+          Height = 25
           Color = clWindow
           Version = '2.0.0.9'
           Visible = True
-          ButtonWidth = 17
+          ButtonWidth = 21
           DisabledBorder = False
           Style = csDropDownList
           EmptyTextStyle = []
@@ -139,7 +139,7 @@ object fmAureliusExport: TfmAureliusExport
           Text = ''
           Visible = True
           OnChange = SaveProperty
-          Version = '4.0.6.5'
+          Version = '4.0.6.7'
         end
         object cbTableNameSingularize: TCheckBox
           Left = 211
@@ -180,11 +180,11 @@ object fmAureliusExport: TfmAureliusExport
           Left = 10
           Top = 35
           Width = 145
-          Height = 21
+          Height = 25
           Color = clWindow
           Version = '2.0.0.9'
           Visible = True
-          ButtonWidth = 17
+          ButtonWidth = 21
           DisabledBorder = False
           Style = csDropDownList
           EmptyTextStyle = []
@@ -239,7 +239,7 @@ object fmAureliusExport: TfmAureliusExport
           Text = ''
           Visible = True
           OnChange = SaveProperty
-          Version = '4.0.6.5'
+          Version = '4.0.6.7'
         end
         object cbAssociationNameCamelCase: TCheckBox
           Left = 10
@@ -271,11 +271,11 @@ object fmAureliusExport: TfmAureliusExport
           Left = 10
           Top = 35
           Width = 145
-          Height = 21
+          Height = 25
           Color = clWindow
           Version = '2.0.0.9'
           Visible = True
-          ButtonWidth = 17
+          ButtonWidth = 21
           DisabledBorder = False
           Style = csDropDownList
           EmptyTextStyle = []
@@ -323,7 +323,7 @@ object fmAureliusExport: TfmAureliusExport
           Text = ''
           Visible = True
           OnChange = SaveProperty
-          Version = '4.0.6.5'
+          Version = '4.0.6.7'
         end
         object cbFieldNameCamelCase: TCheckBox
           Left = 10
@@ -355,11 +355,11 @@ object fmAureliusExport: TfmAureliusExport
           Left = 10
           Top = 35
           Width = 145
-          Height = 21
+          Height = 25
           Color = clWindow
           Version = '2.0.0.9'
           Visible = True
-          ButtonWidth = 17
+          ButtonWidth = 21
           DisabledBorder = False
           Style = csDropDownList
           EmptyTextStyle = []
@@ -414,7 +414,7 @@ object fmAureliusExport: TfmAureliusExport
           Text = ''
           Visible = True
           OnChange = SaveProperty
-          Version = '4.0.6.5'
+          Version = '4.0.6.7'
         end
         object cbManyValuedNameSingularize: TCheckBox
           Left = 211
@@ -455,11 +455,11 @@ object fmAureliusExport: TfmAureliusExport
           Left = 9
           Top = 124
           Width = 175
-          Height = 21
+          Height = 25
           Color = clWindow
           Version = '2.0.0.9'
           Visible = True
-          ButtonWidth = 17
+          ButtonWidth = 21
           DisabledBorder = False
           Style = csDropDownList
           EmptyTextStyle = []
@@ -484,11 +484,11 @@ object fmAureliusExport: TfmAureliusExport
           Left = 9
           Top = 35
           Width = 175
-          Height = 21
+          Height = 25
           Color = clWindow
           Version = '2.0.0.9'
           Visible = True
-          ButtonWidth = 17
+          ButtonWidth = 21
           DisabledBorder = False
           Style = csDropDownList
           EmptyTextStyle = []
@@ -513,11 +513,11 @@ object fmAureliusExport: TfmAureliusExport
           Left = 9
           Top = 79
           Width = 175
-          Height = 21
+          Height = 25
           Color = clWindow
           Version = '2.0.0.9'
           Visible = True
-          ButtonWidth = 17
+          ButtonWidth = 21
           DisabledBorder = False
           Style = csDropDownList
           EmptyTextStyle = []
@@ -565,7 +565,7 @@ object fmAureliusExport: TfmAureliusExport
           Text = ''
           Visible = True
           OnChange = SaveProperty
-          Version = '4.0.6.5'
+          Version = '4.0.6.7'
         end
         object edDefaultDynPropContainer: TAdvEdit
           Left = 201
@@ -594,17 +594,17 @@ object fmAureliusExport: TfmAureliusExport
           Text = ''
           Visible = True
           OnChange = SaveProperty
-          Version = '4.0.6.5'
+          Version = '4.0.6.7'
         end
         object cbCheckSequences: TAdvComboBox
           Left = 9
           Top = 168
           Width = 175
-          Height = 21
+          Height = 25
           Color = clWindow
           Version = '2.0.0.9'
           Visible = True
-          ButtonWidth = 17
+          ButtonWidth = 21
           DisabledBorder = False
           Style = csDropDownList
           EmptyTextStyle = []
@@ -630,11 +630,11 @@ object fmAureliusExport: TfmAureliusExport
           Left = 201
           Top = 35
           Width = 160
-          Height = 21
+          Height = 25
           Color = clWindow
           Version = '2.0.0.9'
           Visible = True
-          ButtonWidth = 17
+          ButtonWidth = 21
           DisabledBorder = False
           Style = csDropDownList
           EmptyTextStyle = []
@@ -660,11 +660,11 @@ object fmAureliusExport: TfmAureliusExport
           Left = 201
           Top = 168
           Width = 160
-          Height = 21
+          Height = 25
           Color = clWindow
           Version = '2.0.0.9'
           Visible = True
-          ButtonWidth = 17
+          ButtonWidth = 21
           DisabledBorder = False
           Style = csDropDownList
           EmptyTextStyle = []
@@ -715,7 +715,7 @@ object fmAureliusExport: TfmAureliusExport
         Text = ''
         Visible = True
         OnChange = SaveProperty
-        Version = '4.0.6.5'
+        Version = '4.0.6.7'
       end
       object GroupBox6: TGroupBox
         Left = 300
@@ -751,7 +751,7 @@ object fmAureliusExport: TfmAureliusExport
           Text = ''
           Visible = True
           OnChange = SaveProperty
-          Version = '4.0.6.5'
+          Version = '4.0.6.7'
         end
         object edDictionaryUnitName: TAdvEdit
           Left = 109
@@ -780,7 +780,7 @@ object fmAureliusExport: TfmAureliusExport
           Text = ''
           Visible = True
           OnChange = SaveProperty
-          Version = '4.0.6.5'
+          Version = '4.0.6.7'
         end
         object cbLegacyDictionary: TCheckBox
           Left = 9
@@ -842,11 +842,38 @@ object fmAureliusExport: TfmAureliusExport
       DesignSize = (
         702
         392)
-      object grTables: TAdvColumnGrid
+      object cbTablesFilter: TComboBox
         Left = 3
         Top = 3
+        Width = 80
+        Height = 21
+        Hint = 'Show all, selected or unselected entities'
+        Style = csDropDownList
+        ItemIndex = 0
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 0
+        Text = 'All'
+        OnChange = TablesFilterChange
+        Items.Strings = (
+          'All'
+          'Selected'
+          'Unselected')
+      end
+      object edTablesFilter: TEdit
+        Left = 86
+        Top = 3
+        Width = 117
+        Height = 21
+        TabOrder = 1
+        TextHint = 'Filter...'
+        OnChange = TablesFilterChange
+      end
+      object grTables: TAdvColumnGrid
+        Left = 3
+        Top = 27
         Width = 200
-        Height = 385
+        Height = 361
         Anchors = [akLeft, akTop, akBottom]
         ColCount = 2
         DrawingStyle = gdsClassic
@@ -854,7 +881,7 @@ object fmAureliusExport: TfmAureliusExport
         FixedRows = 0
         Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing]
         PopupMenu = pmMappings
-        TabOrder = 0
+        TabOrder = 2
         OnClick = grTablesClick
         OnKeyDown = grTablesKeyDown
         OnCheckBoxChange = grTablesCheckBoxChange
@@ -1074,7 +1101,7 @@ object fmAureliusExport: TfmAureliusExport
         Top = 48
         Width = 491
         Height = 340
-        ActivePage = tsAdvanced
+        ActivePage = tsFields
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 3
         object tsFields: TTabSheet
@@ -1082,17 +1109,45 @@ object fmAureliusExport: TfmAureliusExport
           DesignSize = (
             483
             312)
-          object grFields: TAdvColumnGrid
+          object cbFieldsFilter: TComboBox
             Left = 1
             Top = 2
+            Width = 72
+            Height = 21
+            Hint = 'Show all, selected or unselected fields'
+            Style = csDropDownList
+            ItemIndex = 0
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 0
+            Text = 'All'
+            OnChange = FieldsFilterChange
+            Items.Strings = (
+              'All'
+              'Selected'
+              'Unselected')
+          end
+          object edFieldsFilter: TEdit
+            Left = 75
+            Top = 2
+            Width = 79
+            Height = 21
+            TabOrder = 1
+            TextHint = 'Filter...'
+            OnChange = FieldsFilterChange
+          end
+          object grFields: TAdvColumnGrid
+            Left = 1
+            Top = 26
             Width = 153
-            Height = 307
+            Height = 283
             Anchors = [akLeft, akTop, akBottom]
             ColCount = 2
             DrawingStyle = gdsClassic
             FixedCols = 0
             FixedRows = 0
-            TabOrder = 0
+            PopupMenu = pmFields
+            TabOrder = 2
             OnClick = grFieldsClick
             OnKeyDown = grFieldsKeyDown
             OnCheckBoxChange = grFieldsCheckBoxChange
@@ -1333,7 +1388,7 @@ object fmAureliusExport: TfmAureliusExport
             Text = ''
             Visible = True
             OnChange = SaveMappingsProperty
-            Version = '4.0.6.5'
+            Version = '4.0.6.7'
           end
           object chFieldNameDefault: TCheckBox
             Left = 328
@@ -1348,11 +1403,11 @@ object fmAureliusExport: TfmAureliusExport
             Left = 160
             Top = 60
             Width = 162
-            Height = 21
+            Height = 25
             Color = clWindow
             Version = '2.0.0.9'
             Visible = True
-            ButtonWidth = 17
+            ButtonWidth = 21
             DisabledBorder = False
             EmptyTextStyle = []
             DropWidth = 0
@@ -1378,6 +1433,80 @@ object fmAureliusExport: TfmAureliusExport
             TabOrder = 4
             OnClick = SaveMappingsProperty
           end
+          object chColumnDefault: TCheckBox
+            Left = 160
+            Top = 100
+            Width = 240
+            Height = 17
+            Caption = 'Default [Column] attribute'
+            TabOrder = 5
+            OnClick = SaveMappingsProperty
+          end
+          object edColumnName: TAdvEdit
+            Left = 160
+            Top = 138
+            Width = 162
+            Height = 21
+            EmptyTextStyle = []
+            DisabledBorder = False
+            DisabledColor = clWindow
+            LabelCaption = 'Column Name:'
+            LabelPosition = lpTopLeft
+            LabelAlwaysEnabled = True
+            LabelFont.Charset = DEFAULT_CHARSET
+            LabelFont.Color = clWindowText
+            LabelFont.Height = -11
+            LabelFont.Name = 'Tahoma'
+            LabelFont.Style = []
+            Lookup.Font.Charset = DEFAULT_CHARSET
+            Lookup.Font.Color = clWindowText
+            Lookup.Font.Height = -11
+            Lookup.Font.Name = 'Tahoma'
+            Lookup.Font.Style = []
+            Lookup.Separator = ';'
+            Color = clWindow
+            TabOrder = 6
+            Text = ''
+            Visible = True
+            OnChange = SaveMappingsProperty
+            Version = '4.0.6.7'
+          end
+          object chColumnRequired: TCheckBox
+            Left = 160
+            Top = 170
+            Width = 90
+            Height = 17
+            Caption = 'Required'
+            TabOrder = 7
+            OnClick = SaveMappingsProperty
+          end
+          object chColumnNoInsert: TCheckBox
+            Left = 260
+            Top = 170
+            Width = 90
+            Height = 17
+            Caption = 'NoInsert'
+            TabOrder = 8
+            OnClick = SaveMappingsProperty
+          end
+          object chColumnNoUpdate: TCheckBox
+            Left = 160
+            Top = 193
+            Width = 90
+            Height = 17
+            Caption = 'NoUpdate'
+            TabOrder = 9
+            OnClick = SaveMappingsProperty
+          end
+          object chColumnLazy: TCheckBox
+            Left = 260
+            Top = 193
+            Width = 90
+            Height = 17
+            Caption = 'Lazy'
+            TabOrder = 10
+            OnClick = SaveMappingsProperty
+          end
         end
         object tsAssociations: TTabSheet
           Caption = 'Associations'
@@ -1389,7 +1518,7 @@ object fmAureliusExport: TfmAureliusExport
             Left = 1
             Top = 2
             Width = 216
-            Height = 306
+            Height = 299
             Anchors = [akLeft, akTop, akBottom]
             ColCount = 2
             DrawingStyle = gdsClassic
@@ -1645,7 +1774,7 @@ object fmAureliusExport: TfmAureliusExport
             Text = ''
             Visible = True
             OnChange = SaveMappingsProperty
-            Version = '4.0.6.5'
+            Version = '4.0.6.7'
           end
           object cbOneToOneMapping: TAdvComboBox
             Left = 223
@@ -1655,7 +1784,7 @@ object fmAureliusExport: TfmAureliusExport
             Color = clWindow
             Version = '2.0.0.9'
             Visible = True
-            ButtonWidth = 17
+            ButtonWidth = 21
             DisabledBorder = False
             Style = csDropDownList
             EmptyTextStyle = []
@@ -1685,7 +1814,7 @@ object fmAureliusExport: TfmAureliusExport
             Color = clWindow
             Version = '2.0.0.9'
             Visible = True
-            ButtonWidth = 17
+            ButtonWidth = 21
             DisabledBorder = False
             Style = csDropDownList
             EmptyTextStyle = []
@@ -1715,7 +1844,7 @@ object fmAureliusExport: TfmAureliusExport
             Color = clWindow
             Version = '2.0.0.9'
             Visible = True
-            ButtonWidth = 17
+            ButtonWidth = 21
             DisabledBorder = False
             Style = csDropDownList
             EmptyTextStyle = []
@@ -1749,7 +1878,7 @@ object fmAureliusExport: TfmAureliusExport
             Left = 1
             Top = 2
             Width = 216
-            Height = 307
+            Height = 300
             Anchors = [akLeft, akTop, akBottom]
             ColCount = 2
             DrawingStyle = gdsClassic
@@ -2005,7 +2134,7 @@ object fmAureliusExport: TfmAureliusExport
             Text = ''
             Visible = True
             OnChange = SaveMappingsProperty
-            Version = '4.0.6.5'
+            Version = '4.0.6.7'
           end
           object cbManyValuedFetchMode: TAdvComboBox
             Left = 223
@@ -2015,7 +2144,7 @@ object fmAureliusExport: TfmAureliusExport
             Color = clWindow
             Version = '2.0.0.9'
             Visible = True
-            ButtonWidth = 17
+            ButtonWidth = 21
             DisabledBorder = False
             Style = csDropDownList
             EmptyTextStyle = []
@@ -2068,7 +2197,7 @@ object fmAureliusExport: TfmAureliusExport
             Text = ''
             Visible = True
             OnChange = SaveMappingsProperty
-            Version = '4.0.6.5'
+            Version = '4.0.6.7'
           end
           object chDynPropContainerDefault: TCheckBox
             Left = 245
@@ -2083,11 +2212,11 @@ object fmAureliusExport: TfmAureliusExport
             Left = 5
             Top = 20
             Width = 292
-            Height = 21
+            Height = 25
             Color = clWindow
             Version = '2.0.0.9'
             Visible = True
-            ButtonWidth = 17
+            ButtonWidth = 21
             DisabledBorder = False
             EmptyTextStyle = []
             DropWidth = 0
@@ -2131,7 +2260,279 @@ object fmAureliusExport: TfmAureliusExport
             Text = ''
             Visible = True
             OnChange = SaveMappingsProperty
-            Version = '4.0.6.5'
+            Version = '4.0.6.7'
+          end
+        end
+        object tsAttributes: TTabSheet
+          Caption = 'Attributes'
+          ImageIndex = 4
+          DesignSize = (
+            483
+            312)
+          object lbIdFields: TLabel
+            Left = 195
+            Top = 98
+            Width = 44
+            Height = 13
+            Caption = 'Id Fields:'
+          end
+          object chTableAttrDefault: TCheckBox
+            Left = 5
+            Top = 6
+            Width = 240
+            Height = 17
+            Caption = 'Default [Table] attribute'
+            TabOrder = 0
+            OnClick = SaveMappingsProperty
+          end
+          object edTableAttrName: TAdvEdit
+            Left = 5
+            Top = 44
+            Width = 180
+            Height = 21
+            EmptyTextStyle = []
+            DisabledBorder = False
+            DisabledColor = clWindow
+            LabelCaption = 'Table Name:'
+            LabelPosition = lpTopLeft
+            LabelAlwaysEnabled = True
+            LabelFont.Charset = DEFAULT_CHARSET
+            LabelFont.Color = clWindowText
+            LabelFont.Height = -11
+            LabelFont.Name = 'Tahoma'
+            LabelFont.Style = []
+            Lookup.Font.Charset = DEFAULT_CHARSET
+            Lookup.Font.Color = clWindowText
+            Lookup.Font.Height = -11
+            Lookup.Font.Name = 'Tahoma'
+            Lookup.Font.Style = []
+            Lookup.Separator = ';'
+            Color = clWindow
+            TabOrder = 1
+            Text = ''
+            Visible = True
+            OnChange = SaveMappingsProperty
+            Version = '4.0.6.7'
+          end
+          object edTableAttrSchema: TAdvEdit
+            Left = 195
+            Top = 44
+            Width = 130
+            Height = 21
+            EmptyTextStyle = []
+            DisabledBorder = False
+            DisabledColor = clWindow
+            LabelCaption = 'Schema:'
+            LabelPosition = lpTopLeft
+            LabelAlwaysEnabled = True
+            LabelFont.Charset = DEFAULT_CHARSET
+            LabelFont.Color = clWindowText
+            LabelFont.Height = -11
+            LabelFont.Name = 'Tahoma'
+            LabelFont.Style = []
+            Lookup.Font.Charset = DEFAULT_CHARSET
+            Lookup.Font.Color = clWindowText
+            Lookup.Font.Height = -11
+            Lookup.Font.Name = 'Tahoma'
+            Lookup.Font.Style = []
+            Lookup.Separator = ';'
+            Color = clWindow
+            TabOrder = 2
+            Text = ''
+            Visible = True
+            OnChange = SaveMappingsProperty
+            Version = '4.0.6.7'
+          end
+          object chIdDefault: TCheckBox
+            Left = 5
+            Top = 78
+            Width = 240
+            Height = 17
+            Caption = 'Default [Id] attribute'
+            TabOrder = 3
+            OnClick = SaveMappingsProperty
+          end
+          object cbIdGenerator: TAdvComboBox
+            Left = 5
+            Top = 114
+            Width = 180
+            Height = 21
+            Color = clWindow
+            Version = '2.0.0.9'
+            Visible = True
+            ButtonWidth = 21
+            DisabledBorder = False
+            Style = csDropDownList
+            EmptyTextStyle = []
+            DropWidth = 0
+            Enabled = True
+            ItemIndex = -1
+            Items.Strings = (
+              'None'
+              'IdentityOrSequence'
+              'Guid'
+              'Uuid38'
+              'Uuid36'
+              'Uuid32'
+              'SmartGuid'
+              'Custom class')
+            LabelCaption = 'Id Generator:'
+            LabelPosition = lpTopLeft
+            LabelAlwaysEnabled = True
+            LabelFont.Charset = DEFAULT_CHARSET
+            LabelFont.Color = clWindowText
+            LabelFont.Height = -11
+            LabelFont.Name = 'Tahoma'
+            LabelFont.Style = []
+            TabOrder = 4
+            OnChange = SaveMappingsProperty
+          end
+          object clbIdFields: TCheckListBox
+            Left = 195
+            Top = 114
+            Width = 279
+            Height = 113
+            Anchors = [akLeft, akTop, akRight]
+            ItemHeight = 13
+            TabOrder = 5
+            OnClickCheck = SaveMappingsProperty
+          end
+          object edIdGeneratorClass: TAdvEdit
+            Left = 5
+            Top = 160
+            Width = 180
+            Height = 21
+            EmptyText = 'e.g. TMyIdGenerator'
+            EmptyTextStyle = []
+            DisabledBorder = False
+            DisabledColor = clWindow
+            LabelCaption = 'Generator Class:'
+            LabelPosition = lpTopLeft
+            LabelAlwaysEnabled = True
+            LabelFont.Charset = DEFAULT_CHARSET
+            LabelFont.Color = clWindowText
+            LabelFont.Height = -11
+            LabelFont.Name = 'Tahoma'
+            LabelFont.Style = []
+            Lookup.Font.Charset = DEFAULT_CHARSET
+            Lookup.Font.Color = clWindowText
+            Lookup.Font.Height = -11
+            Lookup.Font.Name = 'Tahoma'
+            Lookup.Font.Style = []
+            Lookup.Separator = ';'
+            Color = clWindow
+            TabOrder = 6
+            Text = ''
+            Visible = True
+            OnChange = SaveMappingsProperty
+            Version = '4.0.6.7'
+          end
+          object edIdGeneratorUnit: TAdvEdit
+            Left = 5
+            Top = 206
+            Width = 180
+            Height = 21
+            EmptyText = 'e.g. MyIdGenerators'
+            EmptyTextStyle = []
+            DisabledBorder = False
+            DisabledColor = clWindow
+            LabelCaption = 'Generator Unit:'
+            LabelPosition = lpTopLeft
+            LabelAlwaysEnabled = True
+            LabelFont.Charset = DEFAULT_CHARSET
+            LabelFont.Color = clWindowText
+            LabelFont.Height = -11
+            LabelFont.Name = 'Tahoma'
+            LabelFont.Style = []
+            Lookup.Font.Charset = DEFAULT_CHARSET
+            Lookup.Font.Color = clWindowText
+            Lookup.Font.Height = -11
+            Lookup.Font.Name = 'Tahoma'
+            Lookup.Font.Style = []
+            Lookup.Separator = ';'
+            Color = clWindow
+            TabOrder = 7
+            Text = ''
+            Visible = True
+            OnChange = SaveMappingsProperty
+            Version = '4.0.6.7'
+          end
+          object lbIdGeneratorCode: TLabel
+            Left = 5
+            Top = 236
+            Width = 400
+            Height = 13
+            Caption =
+              'Method bodies, (Entity: TObject; Performer: ICommandPerformer): ' +
+              'Variant - leave both empty to use an existing class of the unit:'
+          end
+          object pcIdGeneratorCode: TPageControl
+            Left = 5
+            Top = 252
+            Width = 469
+            Height = 54
+            ActivePage = tsIdGenerateId
+            Anchors = [akLeft, akTop, akRight, akBottom]
+            TabOrder = 8
+            object tsIdGenerateId: TTabSheet
+              Caption = 'GenerateId'
+              object mmIdGeneratorCode: TScrMemo
+                Left = 0
+                Top = 0
+                Width = 461
+                Height = 26
+                Cursor = crIBeam
+                Align = alClient
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlack
+                Font.Height = -11
+                Font.Name = 'Courier New'
+                Font.Style = []
+                Gutter.Font.Charset = DEFAULT_CHARSET
+                Gutter.Font.Color = clWindowText
+                Gutter.Font.Height = -11
+                Gutter.Font.Name = 'Courier New'
+                Gutter.Font.Style = []
+                Lines.Strings = (
+                  '')
+                SyntaxStyles = ScrPascalMemoStyler1
+                TabOrder = 0
+                TabStop = True
+                UseStyler = True
+                WordWrap = wwNone
+                OnChange = SaveMappingsProperty
+              end
+            end
+            object tsIdRetrieveAfterInsert: TTabSheet
+              Caption = 'RetrieveIdAfterInsert'
+              ImageIndex = 1
+              object mmIdRetrieveCode: TScrMemo
+                Left = 0
+                Top = 0
+                Width = 461
+                Height = 26
+                Cursor = crIBeam
+                Align = alClient
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlack
+                Font.Height = -11
+                Font.Name = 'Courier New'
+                Font.Style = []
+                Gutter.Font.Charset = DEFAULT_CHARSET
+                Gutter.Font.Color = clWindowText
+                Gutter.Font.Height = -11
+                Gutter.Font.Name = 'Courier New'
+                Gutter.Font.Style = []
+                Lines.Strings = (
+                  '')
+                SyntaxStyles = ScrPascalMemoStyler1
+                TabOrder = 0
+                TabStop = True
+                UseStyler = True
+                WordWrap = wwNone
+                OnChange = SaveMappingsProperty
+              end
+            end
           end
         end
       end
@@ -2162,7 +2563,7 @@ object fmAureliusExport: TfmAureliusExport
         Text = ''
         Visible = True
         OnChange = SaveMappingsProperty
-        Version = '4.0.6.5'
+        Version = '4.0.6.7'
       end
       object chTableNameDefault: TCheckBox
         Left = 376
@@ -2200,7 +2601,7 @@ object fmAureliusExport: TfmAureliusExport
         Text = ''
         Visible = True
         OnChange = SaveMappingsProperty
-        Version = '4.0.6.5'
+        Version = '4.0.6.7'
       end
     end
     object tsScript: TTabSheet
@@ -2548,6 +2949,18 @@ object fmAureliusExport: TfmAureliusExport
         Caption = 'Clear All'
         OnClick = ClearAll1Click
       end
+    end
+  end
+  object pmFields: TPopupMenu
+    Left = 365
+    Top = 113
+    object mnFieldsSelectAll: TMenuItem
+      Caption = 'Select All'
+      OnClick = mnFieldsSelectAllClick
+    end
+    object mnFieldsUnselectAll: TMenuItem
+      Caption = 'Unselect All'
+      OnClick = mnFieldsUnselectAllClick
     end
   end
   object IDEEngine1: TIDEEngine

@@ -47,10 +47,21 @@ type
     FCompareForm: TfmCompareDictionaries;
     FScriptViewer: TScriptViewer;
     FReferencePath: string;
+    FResync: boolean;
+    {Current wizard page, used by the action handlers instead of TTabSheet.Visible.
+     Always change pages through SetPage, never pcCompareProjects.ActivePage directly}
+    FPage: TTabSheet;
+    procedure SetPage(APage: TTabSheet);
     function CompareProjects(ABaseDictionary, AReferenceDictionary: TGDAODatabase): boolean;
     function CompareToProject(AReferencePath: string): boolean;
   public
     procedure DoCompareProjects(AMetaData: TAppMetaData; AReferencePath: string='');
+
+    {DB Resync preview: compares the project with ADatabaseDictionary (retrieved from
+     the live database), restricted to the table/view AScopeTableName when not empty.
+     Returns true when changes were applied to the project}
+    function DoResync(AMetaData: TAppMetaData; ADatabaseDictionary: TGDAODatabase;
+      const AConnectionName, AScopeTableName: string): boolean;
   end;
 
 implementation
@@ -64,7 +75,10 @@ procedure TfrmCompareProjects.FormCreate(Sender: TObject);
 begin
   CreateFormSize(Self);
   FReferencePath := '';
-  pcCompareProjects.ActivePage := tsInitial;
+  SetPage(tsInitial);
+  // the Next button is disabled in the dfm: an action notifies its clients only when
+  // a property changes, so start from False for the first Enabled := True to reach it
+  acNext.Enabled := false;
 
   FCompareForm := TfmCompareDictionaries.Create(Self);
   FCompareForm.Parent := tsResults;
@@ -88,20 +102,20 @@ end;
 
 procedure TfrmCompareProjects.acNextExecute(Sender: TObject);
 begin
-  if tsInitial.Visible then
-  begin                                    
+  if FPage = tsInitial then
+  begin
     if CompareToProject(edPath.FileName) then
     begin
-      pcCompareProjects.ActivePage := tsResults;
+      SetPage(tsResults);
       FCompareForm.Focus;
     end
     else
       MessageDlg('There are no differences detected!', mtInformation, [mbOk], 0);
   end
-  else if tsResults.Visible then
+  else if FPage = tsResults then
   begin
     FCompareForm.ApplySelectedActions(FScriptViewer);
-    pcCompareProjects.ActivePage := tsScript;
+    SetPage(tsScript);
   end;
 end;
 
@@ -109,7 +123,7 @@ procedure TfrmCompareProjects.acNextUpdate(Sender: TObject);
 var
   c: string;
 begin
-  if tsResults.Visible then
+  if FPage = tsResults then
   begin
     if FCompareForm.IsApplyChangesSelected then
       c := '&Apply'
@@ -122,8 +136,8 @@ begin
     acNext.Caption := c;
 
   acNext.Enabled :=
-    ((pcCompareProjects.ActivePageIndex < pcCompareProjects.PageCount-1) and (edPath.FileName > ''))
-    and (not tsResults.Visible or FCompareForm.HasSelectedActions);
+    ((FPage.PageIndex < pcCompareProjects.PageCount-1) and ((edPath.FileName > '') or FResync))
+    and ((FPage <> tsResults) or FCompareForm.HasSelectedActions);
 end;
 
 function TfrmCompareProjects.CompareProjects(ABaseDictionary, AReferenceDictionary: TGDAODatabase): boolean;
@@ -175,7 +189,7 @@ var
   c: string;
 begin
   c := '&Cancel';
-  if (pcCompareProjects.ActivePageIndex = pcCompareProjects.PageCount-1) then
+  if (FPage.PageIndex = pcCompareProjects.PageCount-1) then
     c := '&Close';
   if acCancel.Caption <> c then
     acCancel.Caption := c;
@@ -185,15 +199,21 @@ procedure TfrmCompareProjects.acBackUpdate(Sender: TObject);
 var
   page: integer;
 begin
-  page := pcCompareProjects.ActivePageIndex;
-  if FReferencePath > '' then
+  page := FPage.PageIndex;
+  if (FReferencePath > '') or FResync then
     Dec(page);
   acBack.Enabled := page > 0;
 end;
 
 procedure TfrmCompareProjects.acBackExecute(Sender: TObject);
 begin
-  pcCompareProjects.ActivePageIndex := pcCompareProjects.ActivePageIndex - 1;
+  SetPage(pcCompareProjects.Pages[FPage.PageIndex - 1]);
+end;
+
+procedure TfrmCompareProjects.SetPage(APage: TTabSheet);
+begin
+  FPage := APage;
+  pcCompareProjects.ActivePage := APage;
 end;
 
 procedure TfrmCompareProjects.DoCompareProjects(AMetaData: TAppMetaData; AReferencePath: string);
@@ -205,7 +225,7 @@ begin
   begin
     if CompareToProject(FReferencePath) then
     begin
-      pcCompareProjects.ActivePage := tsResults;
+      SetPage(tsResults);
       ShowModal;
     end
     else
@@ -213,6 +233,37 @@ begin
   end
   else
     ShowModal;
+end;
+
+function TfrmCompareProjects.DoResync(AMetaData: TAppMetaData; ADatabaseDictionary: TGDAODatabase;
+  const AConnectionName, AScopeTableName: string): boolean;
+var
+  sproject, sdatabase: string;
+begin
+  result := false;
+  FCurrentMetaData := AMetaData;
+  FResync := true;
+
+  Caption := 'Resync structure from database';
+  FCompareForm.lbDifferences.Caption := 'Differences between project and database';
+  FCompareForm.ScopeTableName := AScopeTableName;
+
+  sproject := ExtractFileName(ChangeFileExt(FCurrentMetadata.FileName, DMProjectExtension));
+  if FCurrentMetaData.PrjName > '' then
+    sproject := Format('%s (%s)', [FCurrentMetaData.PrjName, sproject]);
+  sdatabase := Format('Database (%s)', [AConnectionName]);
+  // same convention as CompareToProject: reference first, current project second
+  FCompareForm.SetDictionaryCaptions(sdatabase, sproject);
+
+  if FCompareForm.CompareDictionaries(FCurrentMetaData, FCurrentMetaData.DataDictionary,
+    ADatabaseDictionary, cmResync) then
+  begin
+    SetPage(tsResults);
+    ShowModal;
+    result := FCompareForm.Applied;
+  end
+  else
+    MessageDlg('The project is in sync with the database: no differences detected.', mtInformation, [mbOk], 0);
 end;
 
 end.
