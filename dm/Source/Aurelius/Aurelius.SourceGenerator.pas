@@ -722,8 +722,8 @@ begin
   Result := [];
   if AField.Required then
     Include(Result, cpRequired);
-  // Counter fields and view columns are read-only (or AField.DataType.Computed)
-  if AField.DataType.Counter or AField.OwnerTable.IsView then
+  // Counter fields, computed fields and view columns are read-only
+  if AField.DataType.Counter or AField.DataType.Computed or AField.OwnerTable.IsView then
     Result := Result + [cpNoInsert, cpNoUpdate];
   if IsBlob(PropertyType(AField)) then
     Include(Result, cpLazy);
@@ -1387,7 +1387,7 @@ begin
     field.CustomAttributes.Add(joinAttr);
     joinAttr.Name := 'JoinColumn';
     columnProps := '';
-    readOnly := childField.DataType.Counter; //or childField.DataType.Computed;
+    readOnly := childField.DataType.Counter or childField.DataType.Computed;
     if childField.Required then
       columnProps := AppendWithComma(columnProps, 'TColumnProp.Required');
     if readOnly then
@@ -1808,7 +1808,7 @@ begin
   prop.ReadMember := field.Name;
 
   // Careful when changing the code below. There are other parts of code that use the same logic. Search for it!
-  prop.HasSetter := true; // not AField.DataType.Computed;
+  prop.HasSetter := not AField.DataType.Computed;
   if prop.HasSetter then
     prop.WriteMember := field.Name;
 
@@ -2312,13 +2312,14 @@ begin
           result := 'TBlob';
       end;
     naComputed:
-      case FOptions.DefaultNonNativePascalTypeConvertion of
-       nnptVariant:
-         result := 'Variant';
-       nnptString:
-         result := 'string';
-       nnptInteger:
-         result := 'Integer';
+      case FOptions.DefaultNonNativePascalTypeConversion of
+        nnptString:
+          result := 'string';
+        nnptInteger:
+          result := 'Integer';
+      else
+        // nnptVariant
+        result := 'Variant';
       end;
   else
     //naUnknown: ;

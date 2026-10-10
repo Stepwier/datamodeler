@@ -126,7 +126,7 @@ type
     acMemoFind: TAction;
     Button2: TButton;
     cbLegacyDictionary: TCheckBox;
-    cbDefaultNonNativePascalTypeConvertion: TAdvComboBox;
+    cbDefaultNonNativePascalTypeConversion: TAdvComboBox;
     chColumnDefault: TCheckBox;
     edColumnName: TAdvEdit;
     chColumnRequired: TCheckBox;
@@ -724,8 +724,8 @@ begin
     if (Sender = cbDefaultOneToOneMapping) then
       FOptions.DefaultOneToOneMapping := TOneToOneMapping(cbDefaultOneToOneMapping.ItemIndex + 1)
     else
-    if (Sender = cbDefaultNonNativePascalTypeConvertion) then
-      FOptions.DefaultNonNativePascalTypeConvertion := TNonNativePascalTypeConvertion(cbDefaultNonNativePascalTypeConvertion.ItemIndex)
+    if (Sender = cbDefaultNonNativePascalTypeConversion) then
+      FOptions.DefaultNonNativePascalTypeConversion := TNonNativePascalTypeConversion(cbDefaultNonNativePascalTypeConversion.ItemIndex)
     else
     if (Sender = cbCheckSequences) then
       FOptions.CheckSequencesMode := TCheckSequencesMode(cbCheckSequences.ItemIndex)
@@ -1999,6 +1999,7 @@ begin
       if SelectedFieldMapping <> nil then
         chFieldNameDefault.Checked := SelectedFieldMapping.DefaultNaming;
     end else
+
     if Sender = cbFieldType then
     begin
       if SelectedFieldMapping <> nil then
@@ -2061,6 +2062,7 @@ begin
       else
         cbOneToOneMapping.ItemIndex := 0;
     end else
+
     if Sender = edManyValuedName then
     begin
       if SelectedManyValuedMapping <> nil then
@@ -2144,8 +2146,8 @@ begin
     if Sender = cbDefaultOneToOneMapping then
       cbDefaultOneToOneMapping.ItemIndex := Ord(FOptions.DefaultOneToOneMapping) - 1
     else
-    if (Sender = cbDefaultNonNativePascalTypeConvertion) then
-      cbDefaultNonNativePascalTypeConvertion.ItemIndex := Ord(FOptions.DefaultNonNativePascalTypeConvertion)
+    if Sender = cbDefaultNonNativePascalTypeConversion then
+      cbDefaultNonNativePascalTypeConversion.ItemIndex := Ord(FOptions.DefaultNonNativePascalTypeConversion)
     else
     if Sender = cbCheckSequences then
       cbCheckSequences.ItemIndex := Ord(FOptions.CheckSequencesMode)
