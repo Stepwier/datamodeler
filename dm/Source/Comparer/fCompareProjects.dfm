@@ -73,6 +73,14 @@ object frmCompareProjects: TfrmCompareProjects
         TabOrder = 2
       end
     end
+    object lbNothingToApply: TLabel
+      Left = 10
+      Top = 14
+      Width = 130
+      Height = 13
+      Caption = 'Nothing selected to apply'
+      Visible = False
+    end
   end
   object Panel1: TPanel
     Left = 0

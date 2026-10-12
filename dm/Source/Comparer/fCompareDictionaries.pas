@@ -130,6 +130,8 @@ type
     procedure DictionaryTreePaintText(Sender: TBaseVirtualTree; const TargetCanvas: TCanvas; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType);
     procedure DictionaryTreeScroll(Sender: TBaseVirtualTree; DeltaX, DeltaY: Integer);
+    {cmResync, project tree: AText followed by what applying the node does (New, Update, Delete)}
+    function ResyncNodeText(ANode: TDictionaryTreeNode; const AText: string): string;
 
     function DistinctCollectionList(ACollection1, ACollection2: TCollection): TStringList;
 
@@ -177,6 +179,8 @@ type
     property ScopeTableName: string read FScopeTableName write FScopeTableName;
     {True after the selected actions were applied to the project}
     property Applied: boolean read FApplied;
+    {Adds the description of each removal set to be applied to AList (object = the action)}
+    procedure GetSelectedRemoveActions(AList: TStrings);
   end;
 
   TDictionaryTreeNodes = class(TCollection)
@@ -607,6 +611,16 @@ begin
   end;
 end;
 
+procedure TfmCompareDictionaries.GetSelectedRemoveActions(AList: TStrings);
+var
+  i: integer;
+begin
+  if Assigned(FListActions) then
+    for i := 0 to FListActions.Count - 1 do
+      if FApplyAction[i] and IsRemoveAction(TatDBAction(FListActions[i])) then
+        AList.AddObject(TatDBAction(FListActions[i]).Description, FListActions[i]);
+end;
+
 procedure TfmCompareDictionaries.DictionarySelectDiffAction(AActionIndex: integer; ASelect: boolean);
 begin
   FApplyAction[AActionIndex] := ASelect;
@@ -776,9 +790,30 @@ begin
             CellText := TGDAOField(ndata.DNode.TargetObject).FieldName;
         end;
       end
+      else if FMode = cmResync then
+        // resync: keep the object name, so the database side shows what is missing
+        CellText := ndata.DNode.Caption + ' ' + NODETEXT_NOTEXISTS
       else
         Celltext := NODETEXT_NOTEXISTS;
+
+    // resync: the project tree tells what applying does to the project
+    if Assigned(ndata) and (FMode = cmResync) and (Sender = FTargetDictionaryTree) then
+      CellText := ResyncNodeText(ndata.DNode, CellText);
   end;
+end;
+
+function TfmCompareDictionaries.ResyncNodeText(ANode: TDictionaryTreeNode; const AText: string): string;
+begin
+  result := AText;
+  if (ANode.CompareState <> csDifferent) or (ANode.ImageIndex = NODEIMAGE_FOLDER) then
+    Exit;
+  // base = database, target = project (FillDictionaryTree is called with the dictionaries swapped)
+  if not Assigned(ANode.TargetObject) then
+    result := ANode.Caption + ' (New)'
+  else if not Assigned(ANode.BaseObject) then
+    result := AText + ' (Delete)'
+  else
+    result := AText + ' (Update)';
 end;
 
 procedure TfmCompareDictionaries.DictionaryTreeInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode;
@@ -1544,6 +1579,18 @@ begin
     begin
       Items.Add('Apply changes to project');
       ItemIndex := 1;
+    end;
+  end;
+
+  // resync shows only the differences by default. OnClick detached: it would
+  // schedule a second comparison that resets the actions chosen by the user
+  if FMode = cmResync then
+  begin
+    chDiffHideUnchanged.OnClick := nil;
+    try
+      chDiffHideUnchanged.Checked := true;
+    finally
+      chDiffHideUnchanged.OnClick := chDiffHideUnchangedClick;
     end;
   end;
 end;

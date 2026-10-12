@@ -33,6 +33,7 @@ type
     edPath: TAdvFileNameEdit;
     tsResults: TTabSheet;
     tsScript: TTabSheet;
+    lbNothingToApply: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure acNextExecute(Sender: TObject);
     procedure acNextUpdate(Sender: TObject);
@@ -54,6 +55,11 @@ type
     procedure SetPage(APage: TTabSheet);
     function CompareProjects(ABaseDictionary, AReferenceDictionary: TGDAODatabase): boolean;
     function CompareToProject(AReferencePath: string): boolean;
+    {Resync: true when nothing on the results page is set to be applied}
+    function NothingToApply: boolean;
+    {Resync: asks the user to confirm the removals set to be applied (no undo).
+     True when there are none or the user confirmed}
+    function ConfirmRemovals: boolean;
   public
     procedure DoCompareProjects(AMetaData: TAppMetaData; AReferencePath: string='');
 
@@ -67,7 +73,7 @@ type
 implementation
 
 uses
-  dgConsts, uAppUtils;
+  dgConsts, uAppUtils, dgDBActions;
 
 {$R *.dfm}
 
@@ -114,6 +120,8 @@ begin
   end
   else if FPage = tsResults then
   begin
+    if not ConfirmRemovals then
+      Exit;
     FCompareForm.ApplySelectedActions(FScriptViewer);
     SetPage(tsScript);
   end;
@@ -138,6 +146,63 @@ begin
   acNext.Enabled :=
     ((FPage.PageIndex < pcCompareProjects.PageCount-1) and ((edPath.FileName > '') or FResync))
     and ((FPage <> tsResults) or FCompareForm.HasSelectedActions);
+
+  lbNothingToApply.Visible := NothingToApply;
+end;
+
+function TfrmCompareProjects.NothingToApply: boolean;
+begin
+  result := FResync and (FPage = tsResults) and not FCompareForm.HasSelectedActions;
+end;
+
+function TfrmCompareProjects.ConfirmRemovals: boolean;
+const
+  // the dialog stays small: counts plus a few table names (the tree shows the full list)
+  MaxTableNames = 5;
+var
+  list: TStringList;
+  tables, fields, i: integer;
+  names: string;
+begin
+  result := true;
+  if not (FResync and FCompareForm.IsApplyChangesSelected) then
+    Exit;
+
+  list := TStringList.Create;
+  try
+    FCompareForm.GetSelectedRemoveActions(list);
+    if list.Count = 0 then
+      Exit;
+
+    tables := 0;
+    fields := 0;
+    names := '';
+    for i := 0 to list.Count - 1 do
+      if list.Objects[i] is TatRemoveTableAction then
+      begin
+        Inc(tables);
+        if tables <= MaxTableNames then
+        begin
+          if names > '' then
+            names := names + ', ';
+          names := names + TatRemoveTableAction(list.Objects[i]).Table.TableName;
+        end;
+      end
+      else if list.Objects[i] is TatRemoveFieldAction then
+        Inc(fields);
+    if tables > MaxTableNames then
+      names := names + Format(' and %d more', [tables - MaxTableNames]);
+    if names > '' then
+      names := Format(' (%s)', [names]);
+
+    result := MessageDlg(Format(
+      'Objects removed from the project: %d table(s)%s, %d field(s), %d other object(s).%s' +
+      'This cannot be undone. Continue?',
+      [tables, names, fields, list.Count - tables - fields, sLineBreak + sLineBreak]),
+      mtWarning, [mbYes, mbNo], 0, mbNo) = mrYes;
+  finally
+    list.Free;
+  end;
 end;
 
 function TfrmCompareProjects.CompareProjects(ABaseDictionary, AReferenceDictionary: TGDAODatabase): boolean;
@@ -189,7 +254,7 @@ var
   c: string;
 begin
   c := '&Cancel';
-  if (FPage.PageIndex = pcCompareProjects.PageCount-1) then
+  if (FPage.PageIndex = pcCompareProjects.PageCount-1) or NothingToApply then
     c := '&Close';
   if acCancel.Caption <> c then
     acCancel.Caption := c;
