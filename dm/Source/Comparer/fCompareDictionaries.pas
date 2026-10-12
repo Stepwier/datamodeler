@@ -805,7 +805,9 @@ end;
 function TfmCompareDictionaries.ResyncNodeText(ANode: TDictionaryTreeNode; const AText: string): string;
 begin
   result := AText;
-  if (ANode.CompareState <> csDifferent) or (ANode.ImageIndex = NODEIMAGE_FOLDER) then
+  // ignored nodes keep the plain text: applying leaves them as they are in the project
+  if (ANode.CompareState <> csDifferent) or (ANode.ImageIndex = NODEIMAGE_FOLDER)
+    or (ANode.DiffAction <> DIFFACTION_APPLYTARGET) then
     Exit;
   // base = database, target = project (FillDictionaryTree is called with the dictionaries swapped)
   if not Assigned(ANode.TargetObject) then
@@ -878,7 +880,9 @@ begin
       if Assigned(ndata) and (ndata.DNode.CompareState = csDifferent) then
       begin
         ndata.DNode.ToggleAction;
-        tree.Invalidate;
+        // both trees: the project tree text depends on the action (resync labels)
+        FBaseDictionaryTree.Invalidate;
+        FTargetDictionaryTree.Invalidate;
       end;
     end;
   end;
@@ -1607,6 +1611,7 @@ begin
   for i := 0 to FDictionaryTreeNodes.Count - 1 do
     TreeSetDiffAction(FDictionaryTreeNodes[i], TMenuItem(Sender).Tag);
   FBaseDictionaryTree.Invalidate;
+  FTargetDictionaryTree.Invalidate;
 end;
 
 procedure TfmCompareDictionaries.miDiffApplyClick(Sender: TObject);
@@ -1615,6 +1620,7 @@ begin
   begin
     TDictionaryTreeNode(popDiffAction.Tag).ToggleAction;
     FBaseDictionaryTree.Invalidate;
+    FTargetDictionaryTree.Invalidate;
   end;
 end;
 
