@@ -132,6 +132,8 @@ type
     procedure DictionaryTreeScroll(Sender: TBaseVirtualTree; DeltaX, DeltaY: Integer);
     {cmResync, project tree: AText followed by what applying the node does (New, Update, Delete)}
     function ResyncNodeText(ANode: TDictionaryTreeNode; const AText: string): string;
+    {cmResync, both trees: bold + color of nodes set to Apply, grey for unchanged/missing}
+    procedure ResyncPaintText(ATree: TBaseVirtualTree; ACanvas: TCanvas; ANode: TDictionaryTreeNode);
 
     function DistinctCollectionList(ACollection1, ACollection2: TCollection): TStringList;
 
@@ -153,6 +155,9 @@ type
 
     procedure InitFilterOptions;
     procedure ShowObjectScript(ANode: TDictionaryTreeNode);
+    {Comments in the object scripts: only for databases that script them (resync compares
+     comments for every database, but the script panel stays as before)}
+    function ScriptComments: boolean;
 
     procedure TreeDiff(ADictionary: TGDAODatabase; AType: TTreeRootType; AObject, AAttribute: string;
       ATableProp: TActionTableProp; AChanged: boolean; AActionIndex: integer);
@@ -181,6 +186,9 @@ type
     property Applied: boolean read FApplied;
     {Adds the description of each removal set to be applied to AList (object = the action)}
     procedure GetSelectedRemoveActions(AList: TStrings);
+    {Adds to AList each relationship set to be applied whose parent or child table is
+     neither in the project nor set to be created: applying skips it}
+    procedure GetSkippedRelationships(AList: TStrings);
   end;
 
   TDictionaryTreeNodes = class(TCollection)
@@ -214,9 +222,12 @@ type
     FParent: TDictionaryTreeNode;
     FNodes: TDictionaryTreeNodes;
     FDiffAction: integer;
-    FActionIndex: array[0..4] of integer; //More than one action can be associated with the node
+    FActionIndex: array of integer; //More than one action can be associated with the node
     procedure SetCompareState(const Value: TNodeCompareState);
     procedure SetDiffAction(const Value: integer);
+    procedure AddActionIndex(AActionIndex: integer);
+    {True when actions are associated with the node itself (not only with its children)}
+    function HasAction: boolean;
   public
     constructor Create(ACollection: TCollection); override;
     destructor Destroy; override;
@@ -570,10 +581,9 @@ procedure TfmCompareDictionaries.UncheckRemoveActions(ANodes: TDictionaryTreeNod
   var
     j: integer;
   begin
-    result := ANode.FActionIndex[0] >= 0;
+    result := ANode.HasAction;
     for j := 0 to High(ANode.FActionIndex) do
-      if (ANode.FActionIndex[j] >= 0)
-        and not IsRemoveAction(TatDBAction(FListActions[ANode.FActionIndex[j]])) then
+      if not IsRemoveAction(TatDBAction(FListActions[ANode.FActionIndex[j]])) then
         Exit(false);
   end;
 
@@ -605,7 +615,7 @@ begin
     UncheckRemoveActions(node.Nodes);
     if HasOnlyRemoveActions(node) then
       node.DiffAction := DIFFACTION_DIFF
-    else if (node.FActionIndex[0] < 0) and AllChangedChildrenUnchecked(node) then
+    else if not node.HasAction and AllChangedChildrenUnchecked(node) then
       // grouping node without own action (e.g. table with only removed fields)
       node.DiffAction := DIFFACTION_DIFF;
   end;
@@ -619,6 +629,41 @@ begin
     for i := 0 to FListActions.Count - 1 do
       if FApplyAction[i] and IsRemoveAction(TatDBAction(FListActions[i])) then
         AList.AddObject(TatDBAction(FListActions[i]).Description, FListActions[i]);
+end;
+
+procedure TfmCompareDictionaries.GetSkippedRelationships(AList: TStrings);
+
+  function TableAvailable(const ATableName: string): boolean;
+  var
+    j: integer;
+  begin
+    result := FCurrentMetaData.DataDictionary.TableByName(ATableName) <> nil;
+    if not result then
+      for j := 0 to FListActions.Count - 1 do
+        if FApplyAction[j] and (TatDBAction(FListActions[j]) is TatCreateTableAction)
+          and SameText(TatCreateTableAction(FListActions[j]).Table.TableName, ATableName) then
+          Exit(true);
+  end;
+
+var
+  i: integer;
+  relationship: TGDAORelationship;
+begin
+  if not Assigned(FListActions) then
+    Exit;
+  for i := 0 to FListActions.Count - 1 do
+    if FApplyAction[i] then
+    begin
+      if TatDBAction(FListActions[i]) is TatCreateRelationshipAction then
+        relationship := TatCreateRelationshipAction(FListActions[i]).Relationship
+      else if TatDBAction(FListActions[i]) is TatChangeRelationshipAction then
+        relationship := TatChangeRelationshipAction(FListActions[i]).Relationship
+      else
+        Continue;
+      if not (TableAvailable(relationship.ParentTableName) and TableAvailable(relationship.ChildTableName)) then
+        AList.AddObject(Format('%s (%s -> %s)', [relationship.RelationshipName,
+          relationship.ChildTableName, relationship.ParentTableName]), FListActions[i]);
+    end;
 end;
 
 procedure TfmCompareDictionaries.DictionarySelectDiffAction(AActionIndex: integer; ASelect: boolean);
@@ -802,20 +847,69 @@ begin
   end;
 end;
 
-function TfmCompareDictionaries.ResyncNodeText(ANode: TDictionaryTreeNode; const AText: string): string;
+type
+  TResyncKind = (rkNone, rkNew, rkUpdate, rkDelete);
+
+const
+  // same color families as the script panel (KindColor), darker to stay readable as text
+  ResyncKindColor: array[TResyncKind] of TColor = (clWindowText, $00C00000, $00008000, $000000C0);
+
+{cmResync: what applying ANode does to the project. rkNone for folders, unchanged and
+ ignored nodes: applying leaves them as they are in the project}
+function ResyncNodeKind(ANode: TDictionaryTreeNode): TResyncKind;
 begin
-  result := AText;
-  // ignored nodes keep the plain text: applying leaves them as they are in the project
   if (ANode.CompareState <> csDifferent) or (ANode.ImageIndex = NODEIMAGE_FOLDER)
     or (ANode.DiffAction <> DIFFACTION_APPLYTARGET) then
-    Exit;
+    result := rkNone
   // base = database, target = project (FillDictionaryTree is called with the dictionaries swapped)
-  if not Assigned(ANode.TargetObject) then
-    result := ANode.Caption + ' (New)'
+  else if not Assigned(ANode.TargetObject) then
+    result := rkNew
   else if not Assigned(ANode.BaseObject) then
-    result := AText + ' (Delete)'
+    result := rkDelete
   else
-    result := AText + ' (Update)';
+    result := rkUpdate;
+end;
+
+{cmResync: true when a node below ANode is set to Apply}
+function HasAppliedDescendant(ANode: TDictionaryTreeNode): boolean;
+var
+  i: integer;
+begin
+  for i := 0 to ANode.Nodes.Count - 1 do
+    if (ResyncNodeKind(ANode.Nodes[i]) <> rkNone) or HasAppliedDescendant(ANode.Nodes[i]) then
+      Exit(true);
+  result := false;
+end;
+
+function TfmCompareDictionaries.ResyncNodeText(ANode: TDictionaryTreeNode; const AText: string): string;
+begin
+  case ResyncNodeKind(ANode) of
+    rkNew: result := ANode.Caption + ' (New)';
+    rkUpdate: result := AText + ' (Update)';
+    rkDelete: result := AText + ' (Delete)';
+  else
+    result := AText;
+  end;
+end;
+
+procedure TfmCompareDictionaries.ResyncPaintText(ATree: TBaseVirtualTree; ACanvas: TCanvas;
+  ANode: TDictionaryTreeNode);
+var
+  kind: TResyncKind;
+begin
+  kind := ResyncNodeKind(ANode);
+  if ANode.CompareState = csEqual then
+    ACanvas.Font.Color := clGray
+  else if kind <> rkNone then
+  begin
+    ACanvas.Font.Style := [fsBold];
+    ACanvas.Font.Color := ResyncKindColor[kind];
+  end;
+  // side where the object does not exist: grey, except the project side of a new
+  // object, which shows the object applying will create
+  if not DictionaryContainsObject(ATree, ANode)
+    and not ((ATree = FTargetDictionaryTree) and (kind = rkNew)) then
+    ACanvas.Font.Color := clGray;
 end;
 
 procedure TfmCompareDictionaries.DictionaryTreeInitNode(Sender: TBaseVirtualTree; ParentNode, Node: PVirtualNode;
@@ -894,14 +988,25 @@ var ndata: PNodeRec;
 
   function CheckAction(dn: TDictionaryTreeNode): boolean;
   begin
-    result := Assigned(dn) and ((dn.FActionIndex[0] >= 0) or CheckAction(dn.Parent));
+    result := Assigned(dn) and (dn.HasAction or CheckAction(dn.Parent));
   end;
 
 begin
   ndata := Sender.GetNodeData(Node);
   if Assigned(ndata) then
   begin
-    if (ndata.DNode.CompareState = csEqual) or not DictionaryContainsObject(Sender, ndata.DNode) then
+    // resync: bold and colored by what applying does (New/Update/Delete), like the labels
+    if (FMode = cmResync) and (ndata.DNode.ImageIndex <> NODEIMAGE_FOLDER) then
+      ResyncPaintText(Sender, TargetCanvas, ndata.DNode)
+    else if FMode = cmResync then
+    begin
+      // resync folders: bold when something below is set to Apply, grey when nothing changed
+      if ndata.DNode.CompareState = csEqual then
+        TargetCanvas.Font.Color := clGray
+      else if HasAppliedDescendant(ndata.DNode) then
+        TargetCanvas.Font.Style := [fsBold];
+    end
+    else if (ndata.DNode.CompareState = csEqual) or not DictionaryContainsObject(Sender, ndata.DNode) then
       TargetCanvas.Font.Color := clGray
     else if CheckAction(ndata.DNode) or ((ndata.DNode.CompareState = csDifferent) and not Sender.Expanded[Node]) then
       TargetCanvas.Font.Style := [fsBold];
@@ -1564,7 +1669,7 @@ begin
     Items.AddObject(NODETEXT_DOMAINS, Pointer(tntDomain));
     for i := 0 to FCurrentMetaData.DataDictionary.Categories.Count - 1 do
       Items.AddObject(FCurrentMetaData.DataDictionary.Categories[i].CategoryNameP, Pointer(tntObject));
-    if FCurrentMetaData.DataDictionary.DatabaseType.ScriptObjectComments then
+    if FCurrentMetaData.DataDictionary.DatabaseType.ScriptObjectComments or (FMode = cmResync) then
       Items.AddObject('Object comments', Pointer(tntComments));
     for i := 0 to Items.Count - 1 do
       Checked[i] := True;
@@ -1650,6 +1755,26 @@ var
   lastKind: TChangeKind;
   hash1, hash2: TList;
 
+  function OneLine(const AText: string): string;
+  begin
+    result := StringReplace(StringReplace(AText, #13#10, ' ', [rfReplaceAll]), #10, ' ', [rfReplaceAll]);
+  end;
+
+  {cmResync: FTargetDictionary is the database}
+  function DatabaseHasCaption(const ATableName, AFieldName: string): boolean;
+  var
+    table: TGDAOTable;
+    field: TGDAOField;
+  begin
+    result := false;
+    table := FTargetDictionary.TableByName(ATableName);
+    if table <> nil then
+    begin
+      field := table.FieldByName(AFieldName);
+      result := (field <> nil) and (Trim(field.FieldCaption) <> '');
+    end;
+  end;
+
   procedure ScriptTable(ATable: TGDAOTable; AScript: TStrings);
   var
     i: integer;
@@ -1663,7 +1788,7 @@ var
       if FSQLFilter.MustInclude(ATable) then
       begin
         FStructurer.CreateTable(ATable);
-        if FSQLFilter.MustIncludeComments then
+        if ScriptComments then
         begin
           if ATable.Description > '' then
             FStructurer.CommentTable(ATable);
@@ -1693,11 +1818,33 @@ var
         if FSQLFilter.MustInclude(ATable.Triggers[i]) then
         begin
           FStructurer.CreateTrigger(ATable.Triggers[i]);
-          if FSQLFilter.MustIncludeComments and (ATable.Triggers[i].Description > '') then
+          if ScriptComments and (ATable.Triggers[i].Description > '') then
             FStructurer.CommentTrigger(ATable.Triggers[i]);
         end;
 
       AScript.Text := FStructurer.SQLScript.Text;
+
+      // resync on a database that does not script comments: show the descriptions as
+      // SQL comments, so description changes are visible in the comparison
+      if (FMode = cmResync) and FSQLFilter.MustIncludeComments and not ScriptComments then
+      begin
+        if ATable.Description > '' then
+          AScript.Add(Format('-- %s: %s', [ATable.TableName, OneLine(ATable.Description)]));
+        for i := 0 to ATable.Fields.Count - 1 do
+          if ATable.Fields[i].Description > '' then
+            AScript.Add(Format('-- %s.%s: %s', [ATable.TableName, ATable.Fields[i].FieldName,
+              OneLine(ATable.Fields[i].Description)]));
+      end;
+
+      // resync: field captions (SQL Server imports column comments as captions), on both
+      // sides but only for fields with a caption in the database, so that captions set
+      // only in the project are not shown as differences that applying would not change
+      if (FMode = cmResync) and FSQLFilter.MustIncludeComments then
+        for i := 0 to ATable.Fields.Count - 1 do
+          if (ATable.Fields[i].FieldCaption > '')
+            and DatabaseHasCaption(ATable.TableName, ATable.Fields[i].FieldName) then
+            AScript.Add(Format('-- %s.%s caption: %s', [ATable.TableName, ATable.Fields[i].FieldName,
+              OneLine(ATable.Fields[i].FieldCaption)]));
     end;
   end;
 
@@ -1709,7 +1856,7 @@ var
       if FSQLFilter.MustInclude(AObject) then
       begin
         FStructurer.CreateExtraObject(AObject, false);
-        if FSQLFilter.MustIncludeComments and (AObject.Description > '') then
+        if ScriptComments and (AObject.Description > '') then
           FStructurer.CommentExtraObject(AObject);
       end;
       AScript.Text := FStructurer.SQLScript.Text;
@@ -1724,7 +1871,7 @@ var
       if FSQLFilter.MustInclude(ADomain) then
       begin
         FStructurer.CreateDomain(ADomain);
-        if FSQLFilter.MustIncludeComments and (ADomain.Information > '') then
+        if ScriptComments and (ADomain.Information > '') then
           FStructurer.CommentDomain(ADomain);
       end;
       AScript.Text := FStructurer.SQLScript.Text;
@@ -1932,12 +2079,7 @@ begin
     begin
       CompareState := csDifferent;
 
-      i := 0;
-      while (i <= 4) and (FActionIndex[i] >= 0) do
-        inc(i);
-      // at most 5 actions per node: writing FActionIndex[5] would overwrite memory
-      if i <= 4 then
-        FActionIndex[i] := AActionIndex;
+      AddActionIndex(AActionIndex);
       if not AChanged then
         FullCompareState;
     end;
@@ -2204,13 +2346,20 @@ begin
   end;
 end;
 
+function TfmCompareDictionaries.ScriptComments: boolean;
+begin
+  result := FSQLFilter.MustIncludeComments
+    and FCurrentMetaData.DataDictionary.DatabaseType.ScriptObjectComments;
+end;
+
 procedure TfmCompareDictionaries.UpdateSQLScriptFilter;
 var
   AItem: TSQLScriptFilterItem;
   i: integer;
 begin
   FSQLFilter.Items := SQLScriptAllFilterItems;
-  if not FCurrentMetaData.DataDictionary.DatabaseType.ScriptObjectComments then
+  // resync compares comments for every database: the importers read them
+  if not (FCurrentMetaData.DataDictionary.DatabaseType.ScriptObjectComments or (FMode = cmResync)) then
     FSQLFilter.Items := FSQLFilter.Items - [fiComments];
 
   for i := 0 to cleDiffObjects.Items.Count - 1 do
@@ -2304,12 +2453,8 @@ end;
 { TDictionaryTreeNode }
 
 constructor TDictionaryTreeNode.Create(ACollection: TCollection);
-var
-  i: integer;
 begin
   inherited;
-  for i := 0 to 4 do
-    FActionIndex[i] := -1;
   FParent := TDictionaryTreeNodes(ACollection).FOwner;
   FNodes := TDictionaryTreeNodes.Create(Self);    
 end;
@@ -2388,16 +2533,26 @@ var
   i: integer;
 begin
   FDiffAction := Value;
-  for i := 0 to 4 do
-    if FActionIndex[i] >= 0 then
-      TDictionaryTreeNodes(Collection).DoSelectDiffAction(FActionIndex[i], FDiffAction = DIFFACTION_APPLYTARGET);
+  for i := 0 to High(FActionIndex) do
+    TDictionaryTreeNodes(Collection).DoSelectDiffAction(FActionIndex[i], FDiffAction = DIFFACTION_APPLYTARGET);
+end;
+
+procedure TDictionaryTreeNode.AddActionIndex(AActionIndex: integer);
+begin
+  SetLength(FActionIndex, Length(FActionIndex) + 1);
+  FActionIndex[High(FActionIndex)] := AActionIndex;
+end;
+
+function TDictionaryTreeNode.HasAction: boolean;
+begin
+  result := Length(FActionIndex) > 0;
 end;
 
 procedure TDictionaryTreeNode.SiblingDiffAction(ADiffAction: integer);
 begin
   if Assigned(Parent) then
   begin
-    if Parent.FActionIndex[0] >= 0 then
+    if Parent.HasAction then
     begin
       DiffAction := ADiffAction;
       FullDiffAction;
@@ -2418,7 +2573,7 @@ begin
   end;
   FullDiffAction;
   ParentDiffAction;
-  if FActionIndex[0] < 0 then
+  if not HasAction then
     SiblingDiffAction(DiffAction);
 end;
 

@@ -319,7 +319,9 @@ begin
          { new relationships }
          CheckNewRelationships;
 
-         if NewDB.DatabaseType.RelationshipsInTablesOnly then
+         // resync applies to the model, where a created table does not bring its
+         // relationships: the relationship actions are needed there
+         if NewDB.DatabaseType.RelationshipsInTablesOnly and not FFilter.ResyncMode then
            RemoveRedundantRelationshipActions;
       end;
       {$IFDEF DATAMODELER}
@@ -541,6 +543,11 @@ begin
 
   if FFilter.MustIncludeComments and FFilter.MustInclude(NewField) and CommentDiffers(OldField.Description, NewField.Description) then
     TatCommentFieldAction.Create(FActionList).Field := NewField;
+
+  // resync: SQL Server imports column comments (MS_Description) as field captions
+  if FFilter.ResyncMode and FFilter.MustIncludeComments and FFilter.MustInclude(NewField)
+    and CommentDiffers(OldField.FieldCaption, NewField.FieldCaption) then
+    TatCaptionFieldAction.Create(FActionList).Field := NewField;
 end;
 
 procedure TDBCompare.CompareTables(OldTable, NewTable: TGDAOTable);

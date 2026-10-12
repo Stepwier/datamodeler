@@ -127,8 +127,9 @@ type
     // igCustom only: generator class name (TAbstractGenerator descendant) and the unit declaring it
     property IdGeneratorClass: string read FIdGeneratorClass write FIdGeneratorClass;
     property IdGeneratorUnit: string read FIdGeneratorUnit write FIdGeneratorUnit;
-    // Bodies of GenerateId and RetrieveIdAfterInsert. When any is set, the class is generated in the entity unit
-    // (IdGeneratorUnit is then ignored); when both are empty, the class is an existing one declared in IdGeneratorUnit
+    // Bodies of GenerateId and RetrieveIdAfterInsert. When any is set, the class is generated in IdGeneratorUnit
+    // (its own unit), or in the entity unit when IdGeneratorUnit is empty; when both are empty, the class is an
+    // existing one declared in IdGeneratorUnit
     property IdGeneratorCode: string read FIdGeneratorCode write FIdGeneratorCode;
     property IdRetrieveCode: string read FIdRetrieveCode write FIdRetrieveCode;
   end;

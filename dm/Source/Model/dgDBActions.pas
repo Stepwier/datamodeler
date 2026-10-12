@@ -547,6 +547,16 @@ type
     procedure ApplyDBAction(ADictionary: TGDAODatabase); override;
   end;
 
+  {Resync only: field caption changed. SQL Server imports column comments (MS_Description)
+   as field captions. No script: the caption exists only in the model}
+  TatCaptionFieldAction = class(TatCommentFieldAction)
+  protected
+    function GetDescription: string; override;
+  public
+    procedure ExecuteDBAction(DBStructurer: TDBStructurer); override;
+    procedure ApplyDBAction(ADictionary: TGDAODatabase); override;
+  end;
+
   TatCommentDomainAction = class(TatCommentAction)
   private
     FDomain: TGDAODomain;
@@ -1998,6 +2008,28 @@ begin
   field := FindDictionaryField(ADictionary, Self.Field);
   if field <> nil then
     field.Description := Self.Field.Description;
+end;
+
+{ TatCaptionFieldAction }
+
+function TatCaptionFieldAction.GetDescription: string;
+begin
+  result := Format('Caption changed on field %s.%s', [Field.OwnerTable.TableName, Field.FieldName]);
+end;
+
+procedure TatCaptionFieldAction.ExecuteDBAction(DBStructurer: TDBStructurer);
+begin
+  // no inherited: the caption has no SQL script
+end;
+
+procedure TatCaptionFieldAction.ApplyDBAction(ADictionary: TGDAODatabase);
+var
+  field: TGDAOField;
+begin
+  // no inherited: it would copy the description
+  field := FindDictionaryField(ADictionary, Self.Field);
+  if field <> nil then
+    field.FieldCaption := Self.Field.FieldCaption;
 end;
 
 { ApplyDBAction - table level actions: primary key, indexes, constraints, triggers, comments }

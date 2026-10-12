@@ -60,6 +60,9 @@ type
     {Resync: asks the user to confirm the removals set to be applied (no undo).
      True when there are none or the user confirmed}
     function ConfirmRemovals: boolean;
+    {Resync: warns about the relationships that applying will skip (their table is not
+     in the project nor set to be created). True when there are none or the user continues}
+    function ConfirmSkippedRelationships: boolean;
   public
     procedure DoCompareProjects(AMetaData: TAppMetaData; AReferencePath: string='');
 
@@ -120,7 +123,7 @@ begin
   end
   else if FPage = tsResults then
   begin
-    if not ConfirmRemovals then
+    if not (ConfirmSkippedRelationships and ConfirmRemovals) then
       Exit;
     FCompareForm.ApplySelectedActions(FScriptViewer);
     SetPage(tsScript);
@@ -153,6 +156,42 @@ end;
 function TfrmCompareProjects.NothingToApply: boolean;
 begin
   result := FResync and (FPage = tsResults) and not FCompareForm.HasSelectedActions;
+end;
+
+function TfrmCompareProjects.ConfirmSkippedRelationships: boolean;
+const
+  // the dialog stays small: the tree shows the full list
+  MaxNames = 5;
+var
+  list: TStringList;
+  i: integer;
+  names: string;
+begin
+  result := true;
+  if not (FResync and FCompareForm.IsApplyChangesSelected) then
+    Exit;
+
+  list := TStringList.Create;
+  try
+    FCompareForm.GetSkippedRelationships(list);
+    if list.Count = 0 then
+      Exit;
+
+    names := '';
+    for i := 0 to Min(list.Count, MaxNames) - 1 do
+      names := names + sLineBreak + '  ' + list[i];
+    if list.Count > MaxNames then
+      names := names + sLineBreak + Format('  ... and %d more', [list.Count - MaxNames]);
+
+    result := MessageDlg(Format(
+      '%d relationship(s) will not be applied, because their table is not in the project ' +
+      'and is not set to be created:%s%s' +
+      'Set the table to Apply to include them. Continue without them?',
+      [list.Count, names, sLineBreak + sLineBreak]),
+      mtWarning, [mbYes, mbNo], 0, mbNo) = mrYes;
+  finally
+    list.Free;
+  end;
 end;
 
 function TfrmCompareProjects.ConfirmRemovals: boolean;

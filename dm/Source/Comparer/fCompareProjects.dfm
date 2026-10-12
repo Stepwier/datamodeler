@@ -631,7 +631,7 @@ object frmCompareProjects: TfrmCompareProjects
     Left = 32
     Top = 104
     object acNext: TAction
-      Caption = '&Next >'
+      Caption = '&Next'
       OnExecute = acNextExecute
       OnUpdate = acNextUpdate
     end
