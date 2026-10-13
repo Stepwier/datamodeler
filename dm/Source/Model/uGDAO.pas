@@ -1039,6 +1039,14 @@ begin
       end;
     end;
   end;
+
+  {Remove view-backed tables whose view no longer exists (older builds deleted the
+   view but kept its table). Only when the model has a views category: without it
+   (e.g. Firebird "retrieve views as tables") view-backed tables have no view object}
+  if FCategories.FindByType(ctView) <> nil then
+    for c := Tables.Count - 1 downto 0 do
+      if Tables[c].IsView and (TableView(Tables[c]) = nil) then
+        Tables[c].Free;
 end;
 
 procedure TGDD.SetRelationships(const Value: TGDAORelationships);
