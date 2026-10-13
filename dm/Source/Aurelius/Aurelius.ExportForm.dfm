@@ -842,6 +842,18 @@ object fmAureliusExport: TfmAureliusExport
       DesignSize = (
         702
         500)
+      object pnMappingsLeft: TPanel
+        Left = 0
+        Top = 0
+        Width = 206
+        Height = 500
+        Align = alLeft
+        BevelOuter = bvNone
+        Constraints.MinWidth = 150
+        TabOrder = 0
+        DesignSize = (
+          206
+          500)
       object cbTablesFilter: TComboBox
         Left = 3
         Top = 3
@@ -865,23 +877,60 @@ object fmAureliusExport: TfmAureliusExport
         Top = 3
         Width = 117
         Height = 21
-        TabOrder = 5
+        Anchors = [akLeft, akTop, akRight]
+        TabOrder = 1
         TextHint = 'Filter...'
         OnChange = TablesFilterChange
+      end
+      object lbLegendBold: TLabel
+        Left = 3
+        Top = 483
+        Width = 98
+        Height = 13
+        Hint =
+          'Entity with custom Aurelius attributes: a "Default [Table]", "De' +
+          'fault [Id]" or field "Default [Column]" option is unchecked'
+        Anchors = [akLeft, akBottom]
+        Caption = 'Bold = customized'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGrayText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object lbLegendItalic: TLabel
+        Left = 125
+        Top = 483
+        Width = 63
+        Height = 13
+        Hint = 'Entity generated from a database view'
+        Anchors = [akLeft, akBottom]
+        Caption = 'Italic = view'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGrayText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsItalic]
+        ParentFont = False
+        ParentShowHint = False
+        ShowHint = True
       end
       object grTables: TAdvColumnGrid
         Left = 3
         Top = 27
         Width = 200
-        Height = 469
-        Anchors = [akLeft, akTop, akBottom]
+        Height = 452
+        Anchors = [akLeft, akTop, akRight, akBottom]
         ColCount = 2
         DrawingStyle = gdsClassic
         FixedCols = 0
         FixedRows = 0
         Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing]
         PopupMenu = pmMappings
-        TabOrder = 6
+        TabOrder = 2
         OnClick = grTablesClick
         OnKeyDown = grTablesKeyDown
         OnCheckBoxChange = grTablesCheckBoxChange
@@ -1096,19 +1145,52 @@ object fmAureliusExport: TfmAureliusExport
           22
           22)
       end
+      end
+      object splMappings: TSplitter
+        Left = 206
+        Top = 0
+        Width = 4
+        Height = 500
+        MinSize = 150
+        ResizeStyle = rsUpdate
+      end
+      object pnMappingsRight: TPanel
+        Left = 210
+        Top = 0
+        Width = 492
+        Height = 500
+        Align = alClient
+        BevelOuter = bvNone
+        Constraints.MinWidth = 300
+        TabOrder = 1
+        DesignSize = (
+          492
+          500)
       object PageControl2: TPageControl
-        Left = 208
+        Left = 0
         Top = 48
-        Width = 491
+        Width = 489
         Height = 448
         ActivePage = tsFields
         Anchors = [akLeft, akTop, akRight, akBottom]
-        TabOrder = 3
+        TabOrder = 2
         object tsFields: TTabSheet
           Caption = 'Fields'
           DesignSize = (
             483
             420)
+          object pnFieldsLeft: TPanel
+            Left = 0
+            Top = 0
+            Width = 156
+            Height = 420
+            Align = alLeft
+            BevelOuter = bvNone
+            Constraints.MinWidth = 120
+            TabOrder = 0
+            DesignSize = (
+              156
+              420)
           object cbFieldsFilter: TComboBox
             Left = 1
             Top = 2
@@ -1132,7 +1214,8 @@ object fmAureliusExport: TfmAureliusExport
             Top = 2
             Width = 79
             Height = 21
-            TabOrder = 11
+            Anchors = [akLeft, akTop, akRight]
+            TabOrder = 1
             TextHint = 'Filter...'
             OnChange = FieldsFilterChange
           end
@@ -1141,13 +1224,13 @@ object fmAureliusExport: TfmAureliusExport
             Top = 26
             Width = 153
             Height = 391
-            Anchors = [akLeft, akTop, akBottom]
+            Anchors = [akLeft, akTop, akRight, akBottom]
             ColCount = 2
             DrawingStyle = gdsClassic
             FixedCols = 0
             FixedRows = 0
             PopupMenu = pmFields
-            TabOrder = 12
+            TabOrder = 2
             OnClick = grFieldsClick
             OnKeyDown = grFieldsKeyDown
             OnCheckBoxChange = grFieldsCheckBoxChange
@@ -1361,8 +1444,26 @@ object fmAureliusExport: TfmAureliusExport
               22
               22)
           end
-          object edFieldName: TAdvEdit
+          end
+          object splFields: TSplitter
+            Left = 156
+            Top = 0
+            Width = 4
+            Height = 420
+            MinSize = 120
+            ResizeStyle = rsUpdate
+          end
+          object pnFieldsRight: TPanel
             Left = 160
+            Top = 0
+            Width = 323
+            Height = 420
+            Align = alClient
+            BevelOuter = bvNone
+            Constraints.MinWidth = 250
+            TabOrder = 1
+          object edFieldName: TAdvEdit
+            Left = 4
             Top = 18
             Width = 162
             Height = 21
@@ -1391,7 +1492,7 @@ object fmAureliusExport: TfmAureliusExport
             Version = '4.0.6.7'
           end
           object chFieldNameDefault: TCheckBox
-            Left = 328
+            Left = 172
             Top = 20
             Width = 145
             Height = 17
@@ -1400,7 +1501,7 @@ object fmAureliusExport: TfmAureliusExport
             OnClick = SaveMappingsProperty
           end
           object cbFieldType: TAdvComboBox
-            Left = 160
+            Left = 4
             Top = 60
             Width = 162
             Height = 25
@@ -1425,7 +1526,7 @@ object fmAureliusExport: TfmAureliusExport
             OnChange = SaveMappingsProperty
           end
           object chFieldTypeDefault: TCheckBox
-            Left = 326
+            Left = 170
             Top = 62
             Width = 145
             Height = 17
@@ -1434,7 +1535,7 @@ object fmAureliusExport: TfmAureliusExport
             OnClick = SaveMappingsProperty
           end
           object chColumnDefault: TCheckBox
-            Left = 160
+            Left = 4
             Top = 100
             Width = 240
             Height = 17
@@ -1443,7 +1544,7 @@ object fmAureliusExport: TfmAureliusExport
             OnClick = SaveMappingsProperty
           end
           object edColumnName: TAdvEdit
-            Left = 160
+            Left = 4
             Top = 138
             Width = 162
             Height = 21
@@ -1472,7 +1573,7 @@ object fmAureliusExport: TfmAureliusExport
             Version = '4.0.6.7'
           end
           object chColumnRequired: TCheckBox
-            Left = 160
+            Left = 4
             Top = 170
             Width = 90
             Height = 17
@@ -1481,7 +1582,7 @@ object fmAureliusExport: TfmAureliusExport
             OnClick = SaveMappingsProperty
           end
           object chColumnNoInsert: TCheckBox
-            Left = 260
+            Left = 104
             Top = 170
             Width = 90
             Height = 17
@@ -1490,7 +1591,7 @@ object fmAureliusExport: TfmAureliusExport
             OnClick = SaveMappingsProperty
           end
           object chColumnNoUpdate: TCheckBox
-            Left = 160
+            Left = 4
             Top = 193
             Width = 90
             Height = 17
@@ -1499,13 +1600,14 @@ object fmAureliusExport: TfmAureliusExport
             OnClick = SaveMappingsProperty
           end
           object chColumnLazy: TCheckBox
-            Left = 260
+            Left = 104
             Top = 193
             Width = 90
             Height = 17
             Caption = 'Lazy'
             TabOrder = 10
             OnClick = SaveMappingsProperty
+          end
           end
         end
         object tsAssociations: TTabSheet
@@ -1514,12 +1616,24 @@ object fmAureliusExport: TfmAureliusExport
           DesignSize = (
             483
             420)
+          object pnAssociationsLeft: TPanel
+            Left = 0
+            Top = 0
+            Width = 219
+            Height = 420
+            Align = alLeft
+            BevelOuter = bvNone
+            Constraints.MinWidth = 120
+            TabOrder = 0
+            DesignSize = (
+              219
+              420)
           object grAssociations: TAdvColumnGrid
             Left = 1
             Top = 2
             Width = 216
             Height = 407
-            Anchors = [akLeft, akTop, akBottom]
+            Anchors = [akLeft, akTop, akRight, akBottom]
             ColCount = 2
             DrawingStyle = gdsClassic
             FixedCols = 0
@@ -1738,8 +1852,26 @@ object fmAureliusExport: TfmAureliusExport
               22
               22)
           end
+          end
+          object splAssociations: TSplitter
+            Left = 219
+            Top = 0
+            Width = 4
+            Height = 420
+            MinSize = 120
+            ResizeStyle = rsUpdate
+          end
+          object pnAssociationsRight: TPanel
+            Left = 223
+            Top = 0
+            Width = 260
+            Height = 420
+            Align = alClient
+            BevelOuter = bvNone
+            Constraints.MinWidth = 230
+            TabOrder = 1
           object chAssociationNameDefault: TCheckBox
-            Left = 359
+            Left = 140
             Top = 20
             Width = 77
             Height = 17
@@ -1748,7 +1880,7 @@ object fmAureliusExport: TfmAureliusExport
             OnClick = SaveMappingsProperty
           end
           object edAssociationName: TAdvEdit
-            Left = 223
+            Left = 4
             Top = 18
             Width = 130
             Height = 21
@@ -1777,7 +1909,7 @@ object fmAureliusExport: TfmAureliusExport
             Version = '4.0.6.7'
           end
           object cbOneToOneMapping: TAdvComboBox
-            Left = 223
+            Left = 4
             Top = 144
             Width = 130
             Height = 25
@@ -1807,7 +1939,7 @@ object fmAureliusExport: TfmAureliusExport
             OnChange = SaveMappingsProperty
           end
           object cbAssociationFetchMode: TAdvComboBox
-            Left = 223
+            Left = 4
             Top = 59
             Width = 130
             Height = 25
@@ -1837,7 +1969,7 @@ object fmAureliusExport: TfmAureliusExport
             OnChange = SaveMappingsProperty
           end
           object cbAssociationCascade: TAdvComboBox
-            Left = 223
+            Left = 4
             Top = 101
             Width = 130
             Height = 25
@@ -1867,6 +1999,7 @@ object fmAureliusExport: TfmAureliusExport
             TabOrder = 4
             OnChange = SaveMappingsProperty
           end
+          end
         end
         object tsManyValued: TTabSheet
           Caption = 'Many-Valued Associations'
@@ -1874,12 +2007,24 @@ object fmAureliusExport: TfmAureliusExport
           DesignSize = (
             483
             420)
+          object pnManyValuedLeft: TPanel
+            Left = 0
+            Top = 0
+            Width = 219
+            Height = 420
+            Align = alLeft
+            BevelOuter = bvNone
+            Constraints.MinWidth = 120
+            TabOrder = 0
+            DesignSize = (
+              219
+              420)
           object grManyValued: TAdvColumnGrid
             Left = 1
             Top = 2
             Width = 216
             Height = 408
-            Anchors = [akLeft, akTop, akBottom]
+            Anchors = [akLeft, akTop, akRight, akBottom]
             ColCount = 2
             DrawingStyle = gdsClassic
             FixedCols = 0
@@ -2098,8 +2243,26 @@ object fmAureliusExport: TfmAureliusExport
               22
               22)
           end
+          end
+          object splManyValued: TSplitter
+            Left = 219
+            Top = 0
+            Width = 4
+            Height = 420
+            MinSize = 120
+            ResizeStyle = rsUpdate
+          end
+          object pnManyValuedRight: TPanel
+            Left = 223
+            Top = 0
+            Width = 260
+            Height = 420
+            Align = alClient
+            BevelOuter = bvNone
+            Constraints.MinWidth = 230
+            TabOrder = 1
           object chManyValuedNameDefault: TCheckBox
-            Left = 351
+            Left = 132
             Top = 20
             Width = 130
             Height = 17
@@ -2108,7 +2271,7 @@ object fmAureliusExport: TfmAureliusExport
             OnClick = SaveMappingsProperty
           end
           object edManyValuedName: TAdvEdit
-            Left = 223
+            Left = 4
             Top = 18
             Width = 122
             Height = 21
@@ -2137,7 +2300,7 @@ object fmAureliusExport: TfmAureliusExport
             Version = '4.0.6.7'
           end
           object cbManyValuedFetchMode: TAdvComboBox
-            Left = 223
+            Left = 4
             Top = 59
             Width = 122
             Height = 25
@@ -2165,6 +2328,7 @@ object fmAureliusExport: TfmAureliusExport
             LabelFont.Style = []
             TabOrder = 3
             OnChange = SaveMappingsProperty
+          end
           end
         end
         object tsAdvanced: TTabSheet
@@ -2723,7 +2887,7 @@ object fmAureliusExport: TfmAureliusExport
         end
       end
       object edTableName: TAdvEdit
-        Left = 208
+        Left = 0
         Top = 21
         Width = 162
         Height = 21
@@ -2745,23 +2909,23 @@ object fmAureliusExport: TfmAureliusExport
         Lookup.Font.Style = []
         Lookup.Separator = ';'
         Color = clWindow
-        TabOrder = 1
+        TabOrder = 0
         Text = ''
         Visible = True
         OnChange = SaveMappingsProperty
         Version = '4.0.6.7'
       end
       object chTableNameDefault: TCheckBox
-        Left = 376
+        Left = 168
         Top = 23
         Width = 73
         Height = 17
         Caption = 'Default'
-        TabOrder = 2
+        TabOrder = 1
         OnClick = SaveMappingsProperty
       end
       object edClassUnitName: TAdvEdit
-        Left = 440
+        Left = 232
         Top = 21
         Width = 153
         Height = 21
@@ -2783,11 +2947,12 @@ object fmAureliusExport: TfmAureliusExport
         Lookup.Font.Style = []
         Lookup.Separator = ';'
         Color = clWindow
-        TabOrder = 4
+        TabOrder = 3
         Text = ''
         Visible = True
         OnChange = SaveMappingsProperty
         Version = '4.0.6.7'
+      end
       end
     end
     object tsScript: TTabSheet
