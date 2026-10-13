@@ -876,6 +876,8 @@ type
     procedure SetReadOnly(const Value: boolean);
     procedure SetVisible(const Value: boolean);
     function GetRestriction: TObjectRestriction;
+    {Renaming a view also renames its view-backed table, which is found by name}
+    procedure SetObjectName(const Value: string);
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
@@ -887,7 +889,7 @@ type
     property ReadOnly: boolean read GetReadOnly write SetReadOnly;
     property Visible: boolean read GetVisible write SetVisible;
   published
-    property ObjectName: string read FObjectName write FObjectName;
+    property ObjectName: string read FObjectName write SetObjectName;
     property Description: string read FDescription write FDescription;
     property CreateImplementation : string read FCreateImplementation write FCreateImplementation;
     property DropImplementation : string read GetDropImplementation write FDropImplementation stored false;
@@ -3936,6 +3938,27 @@ end;
 function TGDAOObject.OwnerCategory: TGDAOCategory;
 begin
   result := TGDAOObjects(Collection).OwnerCategory;
+end;
+
+procedure TGDAOObject.SetObjectName(const Value: string);
+var
+  database: TGDD;
+  viewTable: TGDAOTable;
+begin
+  {Nothing to rename while loading (no previous name) or for other categories.
+  The view-backed table keeps its name if another one already has the new name}
+  if (FObjectName <> '') and (FObjectName <> Value) and (Collection <> nil)
+    and (OwnerCategory <> nil) and (OwnerCategory.CategoryType = ctView) then
+  begin
+    database := TGDAOObjects(Collection).FOwnerDatabase;
+    if (database <> nil) and (database.ViewTableByName(Value) = nil) then
+    begin
+      viewTable := database.ViewTableByName(FObjectName);
+      if viewTable <> nil then
+        viewTable.TableName := Value;
+    end;
+  end;
+  FObjectName := Value;
 end;
 
 function TGDAOObject.ReadProp(APropName: string): variant;
