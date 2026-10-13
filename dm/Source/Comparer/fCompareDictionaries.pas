@@ -138,6 +138,7 @@ type
     function DistinctCollectionList(ACollection1, ACollection2: TCollection): TStringList;
 
     procedure FillDictionaryTree(ABase, ATarget: TGDAODatabase; AActions: TatDBActionList);
+    procedure IncludeViewGroups(var AApply: TArray<boolean>);
     procedure FillDomains(ANode: TDictionaryTreeNode; ABaseDomains, ATargetDomains: TGDAODomains);
     procedure FillObjects(ANode: TDictionaryTreeNode; ABaseObjects, ATargetObjects: TGDAOObjects);
     procedure FillTables(ANode: TDictionaryTreeNode; ABaseTables, ATargetTables: TGDAOTables);
@@ -323,6 +324,57 @@ begin
     FApplicationIdle(Sender, Done);
 end;
 
+procedure TfmCompareDictionaries.IncludeViewGroups(var AApply: TArray<boolean>);
+var
+  names: TStringList;
+  n, i: integer;
+  selected: boolean;
+
+  procedure AddViewNames(ADictionary: TGDAODatabase);
+  var
+    category: TGDAOCategory;
+    j: integer;
+  begin
+    if ADictionary = nil then
+      Exit;
+    category := ADictionary.Categories.FindByType(ctView);
+    if category <> nil then
+      for j := 0 to category.Objects.Count - 1 do
+        names.Add(category.Objects[j].ObjectName);
+    for j := 0 to ADictionary.Tables.Count - 1 do
+      if ADictionary.Tables[j].IsView then
+        names.Add(ADictionary.Tables[j].TableName);
+  end;
+
+begin
+  {A view and its view-backed table (the view columns) are one object for the user:
+   when any action of a view is applied, all of them are, otherwise the view is
+   created without columns (and is missing from the Aurelius export)}
+  names := TStringList.Create;
+  try
+    names.Sorted := True;
+    names.Duplicates := dupIgnore;
+    AddViewNames(FBaseDictionary);
+    AddViewNames(FTargetDictionary);
+    for n := 0 to names.Count - 1 do
+    begin
+      selected := false;
+      for i := 0 to FListActions.Count - 1 do
+        if AApply[i] and ActionRelatesToTable(TatDBAction(FListActions[i]), names[n]) then
+        begin
+          selected := true;
+          break;
+        end;
+      if selected then
+        for i := 0 to FListActions.Count - 1 do
+          if ActionRelatesToTable(TatDBAction(FListActions[i]), names[n]) then
+            AApply[i] := true;
+    end;
+  finally
+    names.Free;
+  end;
+end;
+
 procedure TfmCompareDictionaries.ApplySelectedActions(AScriptViewer: TScriptViewer);
 var
   script: boolean;
@@ -330,15 +382,22 @@ var
   slScript: TStringList;
   i: integer;
   applySQL: TApplySQLEvent;
+  apply: TArray<boolean>;
 begin
   listApply := TatDBActionList.Create(false);
   slScript := TStringList.Create;
   try
-    for i := 0 to FListActions.Count - 1 do
-      if FApplyAction[i] then
-        listApply.Add(FListActions.Items[i]);
-
     script := not IsApplyChangesSelected;
+
+    SetLength(apply, FListActions.Count);
+    for i := 0 to FListActions.Count - 1 do
+      apply[i] := FApplyAction[i];
+    if (FMode = cmResync) and not script then
+      IncludeViewGroups(apply);
+
+    for i := 0 to FListActions.Count - 1 do
+      if apply[i] then
+        listApply.Add(FListActions.Items[i]);
 
     if script then
     begin
