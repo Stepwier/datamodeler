@@ -11,7 +11,7 @@ uses
   ComCtrls, uGDAO, AdvCombo, ExtCtrls,  Buttons, Menus,
   ScrMemo, IDEMain, atScript, atScripter, AdvUtil, AdvMemoToolBar, AdvToolBar,
   AdvToolBarExt, ScrMps, ScrCodeList, System.Actions, Vcl.ActnList,
-  IDEDialog;
+  IDEDialog, CheckLst;
 
 type
   TfmAureliusExport = class(TForm)
@@ -23,6 +23,7 @@ type
     grTables: TAdvColumnGrid;
     cbTablesFilter: TComboBox;
     edTablesFilter: TEdit;
+    lbLegendBold: TLabel;
     pnMappingsLeft: TPanel;
     splMappings: TSplitter;
     pnMappingsRight: TPanel;
@@ -139,6 +140,28 @@ type
     Button2: TButton;
     cbLegacyDictionary: TCheckBox;
     cbDefaultNonNativePascalTypeConversion: TAdvComboBox;
+    chColumnDefault: TCheckBox;
+    edColumnName: TAdvEdit;
+    chColumnRequired: TCheckBox;
+    chColumnNoInsert: TCheckBox;
+    chColumnNoUpdate: TCheckBox;
+    chColumnLazy: TCheckBox;
+    tsAttributes: TTabSheet;
+    lbIdFields: TLabel;
+    chTableAttrDefault: TCheckBox;
+    edTableAttrName: TAdvEdit;
+    edTableAttrSchema: TAdvEdit;
+    chIdDefault: TCheckBox;
+    cbIdGenerator: TAdvComboBox;
+    clbIdFields: TCheckListBox;
+    edIdGeneratorClass: TAdvEdit;
+    edIdGeneratorUnit: TAdvEdit;
+    lbIdGeneratorCode: TLabel;
+    pcIdGeneratorCode: TPageControl;
+    tsIdGenerateId: TTabSheet;
+    mmIdGeneratorCode: TScrMemo;
+    tsIdRetrieveAfterInsert: TTabSheet;
+    mmIdRetrieveCode: TScrMemo;
     procedure grTablesClick(Sender: TObject);
     procedure TablesFilterChange(Sender: TObject);
     procedure FieldsFilterChange(Sender: TObject);
@@ -202,10 +225,19 @@ type
     procedure EmptyGrid(AGrid: TAdvStringGrid);
     procedure EnableGrid(AGrid: TAdvStringGrid; AEnable: boolean);
     procedure LoadTablesGrid;
+    procedure LoadIdFields(ATable: TGDAOTable);
+    procedure LoadColumnOverride;
+    procedure LoadTableAttributes;
+    procedure SaveColumnOverride;
+    procedure SaveCustomId;
+    procedure UpdateIdGeneratorClassEnabled;
+    function CheckedIdFieldCount: Integer;
     function MatchesFilter(ACombo: TComboBox; AEdit: TEdit; const AName: string; AIncluded: Boolean): Boolean;
     procedure ClearTablesFilter;
     procedure SetVisibleTablesIncluded(AIncluded: Boolean);
     procedure SetVisibleFieldsIncluded(AIncluded: Boolean);
+    procedure UpdateTableRowStyle(ARow: integer);
+    procedure UpdateFieldRowStyle(ARow: integer);
     procedure LoadSequencesCombo;
     procedure LoadFieldsGrid(ATable: TGDAOTable);
     procedure LoadAssociationsGrid(ATable: TGDAOTable);
@@ -845,6 +877,75 @@ begin
       LoadMappingsProperty(cbFieldType);
     end else
 
+    if (Sender = chColumnDefault) and (SelectedFieldMapping <> nil) then
+    begin
+      SelectedFieldMapping.CustomColumn := not chColumnDefault.Checked;
+      if SelectedFieldMapping.CustomColumn then
+      begin
+        // start from the calculated attribute
+        SelectedFieldMapping.ColumnName := '';
+        SelectedFieldMapping.ColumnProps := FGenerator.DefaultColumnProps(SelectedField);
+      end;
+      LoadColumnOverride;
+      UpdateFieldRowStyle(grFields.Row);
+      UpdateTableRowStyle(grTables.Row);
+    end else
+    if ((Sender = edColumnName) or (Sender = chColumnRequired) or (Sender = chColumnNoInsert)
+      or (Sender = chColumnNoUpdate) or (Sender = chColumnLazy)) and (SelectedFieldMapping <> nil) then
+    begin
+      SaveColumnOverride;
+    end else
+
+    if (Sender = chTableAttrDefault) and (SelectedTableMapping <> nil) then
+    begin
+      SelectedTableMapping.CustomTable := not chTableAttrDefault.Checked;
+      SelectedTableMapping.TableName := '';
+      SelectedTableMapping.Schema := '';
+      LoadTableAttributes;
+      UpdateTableRowStyle(grTables.Row);
+    end else
+    if (Sender = edTableAttrName) and (SelectedTableMapping <> nil) then
+    begin
+      // the model table name is stored as empty, so a later rename in the model is followed
+      if edTableAttrName.Text = SelectedTable.TableName then
+        SelectedTableMapping.TableName := ''
+      else
+        SelectedTableMapping.TableName := Trim(edTableAttrName.Text);
+    end else
+    if (Sender = edTableAttrSchema) and (SelectedTableMapping <> nil) then
+    begin
+      SelectedTableMapping.Schema := Trim(edTableAttrSchema.Text);
+    end else
+    if (Sender = chIdDefault) and (SelectedTableMapping <> nil) then
+    begin
+      SelectedTableMapping.CustomId := not chIdDefault.Checked;
+      if SelectedTableMapping.CustomId then
+        SaveCustomId // start from the displayed default Id
+      else
+        SelectedTableMapping.IdFieldIds.Clear;
+      LoadTableAttributes;
+      UpdateTableRowStyle(grTables.Row);
+    end else
+    if ((Sender = cbIdGenerator) or (Sender = clbIdFields)) and (SelectedTableMapping <> nil) then
+    begin
+      // An entity needs at least one Id field: unchecking the last one is undone
+      if (Sender = clbIdFields) and (clbIdFields.ItemIndex >= 0)
+        and not clbIdFields.Checked[clbIdFields.ItemIndex] and (CheckedIdFieldCount = 0) then
+        clbIdFields.Checked[clbIdFields.ItemIndex] := True;
+      SaveCustomId;
+      UpdateIdGeneratorClassEnabled;
+    end else
+    if ((Sender = edIdGeneratorClass) or (Sender = edIdGeneratorUnit)) and (SelectedTableMapping <> nil) then
+    begin
+      SelectedTableMapping.IdGeneratorClass := Trim(edIdGeneratorClass.Text);
+      SelectedTableMapping.IdGeneratorUnit := Trim(edIdGeneratorUnit.Text);
+    end else
+    if ((Sender = mmIdGeneratorCode) or (Sender = mmIdRetrieveCode)) and (SelectedTableMapping <> nil) then
+    begin
+      SelectedTableMapping.IdGeneratorCode := mmIdGeneratorCode.Lines.Text;
+      SelectedTableMapping.IdRetrieveCode := mmIdRetrieveCode.Lines.Text;
+    end else
+
     if (Sender = edAssociationName) and (SelectedAssociationMapping <> nil) then
     begin
       SelectedAssociationMapping.PropertyName := edAssociationName.Text;
@@ -1027,6 +1128,7 @@ begin
   LoadMappingsProperty(chFieldNameDefault);
   LoadMappingsProperty(cbFieldType);
   LoadMappingsProperty(chFieldTypeDefault);
+  LoadColumnOverride;
 end;
 
 procedure TfmAureliusExport.grFieldsKeyDown(Sender: TObject; var Key: Word;
@@ -1083,6 +1185,7 @@ begin
   LoadMappingsProperty(chDynPropContainerDefault);
   LoadMappingsProperty(edModelNames);
   LoadMappingsProperty(edClassUnitName);
+  LoadTableAttributes;
 end;
 
 procedure TfmAureliusExport.grTablesKeyDown(Sender: TObject; var Key: Word;
@@ -1183,6 +1286,7 @@ begin
       if not field.Required then
         grfields.AddCheckBox(0, row, (mapping = nil) or not mapping.Excluded, False);
       grFields.Cells[1, row] := field.FieldName;
+      UpdateFieldRowStyle(row);
       if selected = field then
         grFields.Row := c;
     end;
@@ -1272,6 +1376,8 @@ begin
     end;
     grTables.Options := grTables.Options + [goRowSelect];
     grTables.Sort(0);
+    for c := 0 to grTables.RowCount - 1 do
+      UpdateTableRowStyle(c);
     // Keep the selected table if it is still visible (after the sort)
     row := FindRowFromObject(grTables, selected);
     if row >= 0 then
@@ -1336,6 +1442,297 @@ begin
       grTables.SetCheckBoxState(0, row, AIncluded);
     end;
   end;
+end;
+
+procedure TfmAureliusExport.UpdateTableRowStyle(ARow: integer);
+var
+  table: TGDAOTable;
+  mapping: TTableMapping;
+  fieldMapping: TFieldMapping;
+  overridden: boolean;
+  styles: TFontStyles;
+begin
+  if (ARow < 0) or (ARow >= grTables.RowCount) then Exit;
+  table := ObjectFromGrid<TGDAOTable>(grTables, ARow);
+  if table = nil then Exit;
+
+  overridden := False;
+  if FOptions.Tables.TryGetValue(table.TID, mapping) then
+  begin
+    overridden := mapping.CustomTable or mapping.CustomId;
+    if not overridden then
+      for fieldMapping in mapping.Fields.Values do
+        if fieldMapping.CustomColumn then
+        begin
+          overridden := True;
+          break;
+        end;
+  end;
+
+  // Bold = Aurelius attribute override
+  styles := [];
+  if overridden then
+    Include(styles, fsBold);
+  grTables.FontStyles[1, ARow] := styles;
+end;
+
+procedure TfmAureliusExport.UpdateFieldRowStyle(ARow: integer);
+var
+  field: TGDAOField;
+  tableMapping: TTableMapping;
+  mapping: TFieldMapping;
+begin
+  if (ARow < 0) or (ARow >= grFields.RowCount) then Exit;
+  field := ObjectFromGrid<TGDAOField>(grFields, ARow);
+  if field = nil then Exit;
+  if FOptions.Tables.TryGetValue(field.OwnerTable.TID, tableMapping)
+    and tableMapping.Fields.TryGetValue(field.FID, mapping) and mapping.CustomColumn then
+    grFields.FontStyles[1, ARow] := [fsBold]
+  else
+    grFields.FontStyles[1, ARow] := [];
+end;
+
+procedure TfmAureliusExport.LoadColumnOverride;
+var
+  mapping: TFieldMapping;
+  props: TColumnPropOptions;
+  custom: boolean;
+begin
+  Inc(FLoading);
+  try
+    mapping := SelectedFieldMapping;
+    custom := (mapping <> nil) and mapping.CustomColumn;
+    chColumnDefault.Enabled := mapping <> nil;
+    chColumnDefault.Checked := not custom;
+    props := [];
+    if mapping = nil then
+      edColumnName.Text := ''
+    else
+    if custom then
+    begin
+      edColumnName.Text := mapping.ColumnName;
+      if edColumnName.Text = '' then
+        edColumnName.Text := SelectedField.FieldName;
+      props := mapping.ColumnProps;
+    end
+    else
+    begin
+      // show the calculated attribute
+      edColumnName.Text := SelectedField.FieldName;
+      props := FGenerator.DefaultColumnProps(SelectedField);
+    end;
+    chColumnRequired.Checked := cpRequired in props;
+    chColumnNoInsert.Checked := cpNoInsert in props;
+    chColumnNoUpdate.Checked := cpNoUpdate in props;
+    chColumnLazy.Checked := cpLazy in props;
+
+    edColumnName.Enabled := custom;
+    chColumnRequired.Enabled := custom;
+    chColumnNoInsert.Enabled := custom;
+    chColumnNoUpdate.Enabled := custom;
+    chColumnLazy.Enabled := custom;
+  finally
+    Dec(FLoading);
+  end;
+end;
+
+procedure TfmAureliusExport.SaveColumnOverride;
+var
+  mapping: TFieldMapping;
+  props: TColumnPropOptions;
+begin
+  mapping := SelectedFieldMapping;
+  if (mapping = nil) or not mapping.CustomColumn then Exit;
+
+  // the model field name is stored as empty, so a later rename in the model is followed
+  if edColumnName.Text = SelectedField.FieldName then
+    mapping.ColumnName := ''
+  else
+    mapping.ColumnName := Trim(edColumnName.Text);
+
+  props := [];
+  if chColumnRequired.Checked then
+    Include(props, cpRequired);
+  if chColumnNoInsert.Checked then
+    Include(props, cpNoInsert);
+  if chColumnNoUpdate.Checked then
+    Include(props, cpNoUpdate);
+  if chColumnLazy.Checked then
+    Include(props, cpLazy);
+  mapping.ColumnProps := props;
+end;
+
+procedure TfmAureliusExport.LoadTableAttributes;
+var
+  mapping: TTableMapping;
+  table: TGDAOTable;
+begin
+  Inc(FLoading);
+  try
+    table := SelectedTable;
+    mapping := SelectedTableMapping;
+    chTableAttrDefault.Enabled := mapping <> nil;
+    chIdDefault.Enabled := mapping <> nil;
+    if mapping = nil then
+    begin
+      chTableAttrDefault.Checked := True;
+      chIdDefault.Checked := True;
+      edTableAttrName.Text := '';
+      edTableAttrSchema.Text := '';
+      edTableAttrName.Enabled := False;
+      edTableAttrSchema.Enabled := False;
+      cbIdGenerator.ItemIndex := -1;
+      cbIdGenerator.Enabled := False;
+      clbIdFields.Items.Clear;
+      clbIdFields.Enabled := False;
+      edIdGeneratorClass.Text := '';
+      edIdGeneratorUnit.Text := '';
+      mmIdGeneratorCode.Lines.Text := '';
+      mmIdRetrieveCode.Lines.Text := '';
+      UpdateIdGeneratorClassEnabled;
+      Exit;
+    end;
+
+    chTableAttrDefault.Checked := not mapping.CustomTable;
+    if mapping.CustomTable and (mapping.TableName <> '') then
+      edTableAttrName.Text := mapping.TableName
+    else
+      edTableAttrName.Text := table.TableName;
+    if mapping.CustomTable then
+      edTableAttrSchema.Text := mapping.Schema
+    else
+      edTableAttrSchema.Text := '';
+    edTableAttrName.Enabled := mapping.CustomTable;
+    edTableAttrSchema.Enabled := mapping.CustomTable;
+
+    chIdDefault.Checked := not mapping.CustomId;
+    LoadIdFields(table);
+    cbIdGenerator.Enabled := mapping.CustomId;
+    clbIdFields.Enabled := mapping.CustomId;
+    edIdGeneratorClass.Text := mapping.IdGeneratorClass;
+    edIdGeneratorUnit.Text := mapping.IdGeneratorUnit;
+    mmIdGeneratorCode.Lines.Text := mapping.IdGeneratorCode;
+    mmIdRetrieveCode.Lines.Text := mapping.IdRetrieveCode;
+    UpdateIdGeneratorClassEnabled;
+  finally
+    Dec(FLoading);
+  end;
+end;
+
+procedure TfmAureliusExport.LoadIdFields(ATable: TGDAOTable);
+var
+  mapping: TTableMapping;
+  field: TGDAOField;
+  c: Integer;
+  idx: Integer;
+  pkCount: Integer;
+  generator: TIdGeneratorOption;
+begin
+  mapping := FGenerator.TableMapping(ATable);
+  clbIdFields.Items.BeginUpdate;
+  try
+    clbIdFields.Items.Clear;
+    pkCount := 0;
+    for c := 0 to ATable.Fields.Count - 1 do
+    begin
+      field := ATable.Fields[c];
+      idx := clbIdFields.Items.AddObject(field.FieldName, field);
+      if mapping.CustomId then
+        clbIdFields.Checked[idx] := mapping.IdFieldIds.IndexOf(field.FID) >= 0
+      else
+      if ATable.HasPrimaryKey and (ATable.PrimaryKeyIndex.IFields.FindByField(field) <> nil) then
+      begin
+        clbIdFields.Checked[idx] := True;
+        Inc(pkCount);
+      end;
+    end;
+  finally
+    clbIdFields.Items.EndUpdate;
+  end;
+
+  if mapping.CustomId then
+    generator := mapping.IdGenerator
+  else
+  begin
+    // Default Id shown as a starting point: primary key fields, generator as in RetrieveIdInfo
+    generator := igNone;
+    if pkCount = 1 then
+    begin
+      field := ATable.PrimaryKeyIndex.IFields[0].Field;
+      if field.DataType.Counter then
+        generator := igIdentityOrSequence
+      else
+      if field.DataType.NativeSubType = stGuid then
+        generator := igGuid
+      else
+      if (field.DataType.NativeDataType in [naInteger, naFloat])
+        and (mapping.SequenceName <> '') and not mapping.IgnoreSequence then
+        generator := igIdentityOrSequence;
+    end;
+  end;
+  cbIdGenerator.ItemIndex := Ord(generator);
+end;
+
+procedure TfmAureliusExport.SaveCustomId;
+var
+  mapping: TTableMapping;
+  c: Integer;
+begin
+  mapping := SelectedTableMapping;
+  if (mapping = nil) or not mapping.CustomId then Exit;
+
+  mapping.IdFieldIds.Clear;
+  for c := 0 to clbIdFields.Items.Count - 1 do
+    if clbIdFields.Checked[c] then
+      mapping.IdFieldIds.Add(TGDAOField(clbIdFields.Items.Objects[c]).FID);
+  if cbIdGenerator.ItemIndex >= 0 then
+    mapping.IdGenerator := TIdGeneratorOption(cbIdGenerator.ItemIndex)
+  else
+    mapping.IdGenerator := igNone;
+end;
+
+function TfmAureliusExport.CheckedIdFieldCount: Integer;
+var
+  c: Integer;
+begin
+  Result := 0;
+  for c := 0 to clbIdFields.Items.Count - 1 do
+    if clbIdFields.Checked[c] then
+      Inc(Result);
+end;
+
+procedure TfmAureliusExport.UpdateIdGeneratorClassEnabled;
+var
+  customId: Boolean;
+  composite: Boolean;
+  isCustom: Boolean;
+  idCount: Integer;
+begin
+  // Aurelius ignores the generator of a composite Id: the generator stays stored but is disabled
+  customId := (SelectedTableMapping <> nil) and SelectedTableMapping.CustomId;
+  idCount := CheckedIdFieldCount;
+  // A custom Id can start empty (e.g. a view has no primary key): ask for a field
+  if customId and (idCount = 0) then
+    lbIdFields.Caption := 'Id Fields: (select at least one)'
+  else
+    lbIdFields.Caption := 'Id Fields:';
+  composite := customId and (idCount > 1);
+  cbIdGenerator.Enabled := customId and not composite;
+  if composite then
+    cbIdGenerator.LabelCaption := 'Id Generator: (composite Id - none)'
+  else
+    cbIdGenerator.LabelCaption := 'Id Generator:';
+
+  // Class, unit and code only apply to the Custom generator. Unit + code: class generated in that unit;
+  // code only: class generated in the entity unit; unit only: existing class declared in that unit
+  isCustom := cbIdGenerator.Enabled and (cbIdGenerator.ItemIndex = Ord(igCustom));
+  edIdGeneratorClass.Enabled := isCustom;
+  edIdGeneratorUnit.Enabled := isCustom;
+  mmIdGeneratorCode.Enabled := isCustom;
+  mmIdGeneratorCode.ReadOnly := not isCustom;
+  mmIdRetrieveCode.Enabled := isCustom;
+  mmIdRetrieveCode.ReadOnly := not isCustom;
+  lbIdGeneratorCode.Enabled := isCustom;
 end;
 
 procedure TfmAureliusExport.MemoActionUpdate(Sender: TObject);

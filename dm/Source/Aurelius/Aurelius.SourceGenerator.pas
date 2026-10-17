@@ -39,6 +39,12 @@ type
     MemberNames: TArray<string>;
     Generator: TIdGenerator;
     SequenceName: string;
+    // Custom generator class; when set it replaces Generator in the [Id] attribute
+    GeneratorClass: string;
+    GeneratorUnit: string;
+    // GenerateId / RetrieveIdAfterInsert bodies; when any is set the generator class is generated in the entity unit
+    GeneratorCode: string;
+    RetrieveCode: string;
   end;
 
   TSourceGenerator = class
@@ -48,7 +54,10 @@ type
     FInheritanceParentMap: TDictionary<TGDAOTable, TGDAORelationship>;
     FIsInheritanceBase: TDictionary<TGDAOTable, boolean>;
     FCodeUnits: TList<TCodeUnit>;
+    // Generated custom Id generator classes: 'unit|class' (lowercase) -> GenerateId body
+    FGeneratorCodes: TDictionary<string, string>;
     function AppendWithComma(S, S2: string): string;
+    procedure GenerateIdGeneratorClass(ACodeUnit: TCodeUnit; ATable: TGDAOTable; AIdInfo: TEntityIdInfo);
     function ValidName(S: string): string;
     procedure AddUsedUnit(ACodeUnit: TCodeUnit; AUsedUnit: string); overload;
     procedure AddUsedUnit(ACodeUnit: TCodeUnit; ATable: TGDAOTable); overload;
@@ -89,6 +98,7 @@ type
     function BuildAssociationName(ARelationship: TGDAORelationship; ANameSource: TAssociationNameSource;
       AFormat: string; ASingularize: boolean; ACamelCase: boolean; ARemoveUnderline: boolean): string;
     function RetrieveIdInfo(ATable: TGDAOTable): TEntityIdInfo;
+    function RetrieveCustomIdInfo(ATable: TGDAOTable; AMapping: TTableMapping): TEntityIdInfo;
     procedure ErrorFmt(Msg: string; const Args: array of const);
     procedure BuildInheritanceMap;
     function IsBlob(AType: string): boolean;
@@ -126,6 +136,7 @@ type
     function AssociationMapping(AAssociation: TGDAORelationship): TAssociationMapping;
     function FieldMapping(AField: TGDAOField): TFieldMapping;
     function ManyValuedMapping(AManyValued: TGDAORelationship): TAssociationMapping;
+    function DefaultColumnProps(AField: TGDAOField): TColumnPropOptions;
 
     function ClassName(ATable: TGDAOTable): string;
     function PropertyName(AField: TGDAOField): string;
@@ -265,6 +276,9 @@ implementation
 
 uses
   DXInflector, Bcl.Code.DelphiGenerator;
+
+const
+  IdGeneratorBaseClass = 'TAbstractGenerator';
 
 function CamelCase(const S: string): string;
 var
@@ -629,6 +643,7 @@ begin
   FInheritanceParentMap := TDictionary<TGDAOTable, TGDAORelationship>.Create;
   FIsInheritanceBase := TDictionary<TGDAOTable, boolean>.Create;
   FCodeUnits := TObjectList<TCodeUnit>.Create;
+  FGeneratorCodes := TDictionary<string, string>.Create;
 
   {$IFDEF USE_SCRIPTER}
   FScripter := TIDEScripter.Create(nil);
@@ -650,24 +665,36 @@ procedure TSourceGenerator.CreateColumnAttributeArguments(
   AAttr: TCodeAttributeDeclaration; AField: TGDAOField);
 var
   columnProps: string;
-  readOnly: boolean;
-  lazy: boolean;
+  columnName: string;
+  props: TColumnPropOptions;
+  mapping: TFieldMapping;
 begin
+  mapping := FieldMapping(AField);
+  if mapping.CustomColumn then
+  begin
+    columnName := mapping.ColumnName;
+    props := mapping.ColumnProps;
+  end
+  else
+  begin
+    columnName := '';
+    props := DefaultColumnProps(AField);
+  end;
+  if columnName = '' then
+    columnName := AField.FieldName;
+
   columnProps := '';
-  readOnly := AField.DataType.Counter or AField.DataType.Computed;
-  lazy := IsBlob(PropertyType(AField));
-  if AField.Required then
+  if cpRequired in props then
     columnProps := AppendWithComma(columnProps, 'TColumnProp.Required');
-  if readOnly then
+  if cpNoInsert in props then
     columnProps := AppendWithComma(columnProps, 'TColumnProp.NoInsert');
-  if readOnly then
+  if cpNoUpdate in props then
     columnProps := AppendWithComma(columnProps, 'TColumnProp.NoUpdate');
-  if lazy then
+  if cpLazy in props then
     columnProps := AppendWithComma(columnProps, 'TColumnProp.Lazy');
 
-
   AAttr.Arguments.Add(TCodeAttributeArgument.Create(
-    Format('''%s''', [AField.FieldName])));
+    Format('''%s''', [columnName])));
   AAttr.Arguments.Add(TCodeAttributeArgument.Create(
     Format('[%s]', [columnProps])));
   AAttr.Arguments.Add(TCodeAttributeArgument.Create(IntToStr(AField.Size)));
@@ -690,6 +717,18 @@ begin
   end;
 end;
 
+function TSourceGenerator.DefaultColumnProps(AField: TGDAOField): TColumnPropOptions;
+begin
+  Result := [];
+  if AField.Required then
+    Include(Result, cpRequired);
+  // Counter fields and computed fields are read-only
+  if AField.DataType.Counter or AField.DataType.Computed then
+    Result := Result + [cpNoInsert, cpNoUpdate];
+  if IsBlob(PropertyType(AField)) then
+    Include(Result, cpLazy);
+end;
+
 function TSourceGenerator.DefineIdAttribute(AType: TCodeTypeDeclaration; AIdInfo: TEntityIdInfo):
   TArray<TCodeAttributeDeclaration>;
 var
@@ -699,6 +738,7 @@ begin
   case AIdInfo.Generator of
     TIdGenerator.IdentityOrSequence: generatorStr := 'TIdGenerator.IdentityOrSequence';
     TIdGenerator.Guid: generatorStr := 'TIdGenerator.Guid';
+    TIdGenerator.SmartGuid: generatorStr := 'TIdGenerator.SmartGuid';
     TIdGenerator.Uuid38: generatorStr := 'TIdGenerator.Uuid38';
     TIdGenerator.Uuid36: generatorStr := 'TIdGenerator.Uuid36';
     TIdGenerator.Uuid32: generatorStr := 'TIdGenerator.Uuid32';
@@ -706,6 +746,8 @@ begin
     // idNone
     generatorStr := 'TIdGenerator.None';
   end;
+  if AIdInfo.GeneratorClass <> '' then
+    generatorStr := AIdInfo.GeneratorClass;
   if Length(AIdInfo.MemberNames) > 1 then
     generatorStr := 'TIdGenerator.None';
 
@@ -720,6 +762,79 @@ begin
   end;
 end;
 
+procedure TSourceGenerator.GenerateIdGeneratorClass(ACodeUnit: TCodeUnit; ATable: TGDAOTable;
+  AIdInfo: TEntityIdInfo);
+var
+  key: string;
+  code: string;
+  existingCode: string;
+  codeType: TCodeTypeDeclaration;
+
+  procedure AddMethod(const AName, ABody: string);
+  var
+    method: TCodeMemberMethod;
+    lines: TStringList;
+    line: string;
+  begin
+    method := TCodeMemberMethod.Create;
+    codeType.Members.Add(method);
+    method.Name := AName;
+    method.Visibility := mvPublic;
+    method.Directives := [mdOverride];
+    method.Parameters.Add(TCodeParameterDeclaration.Create('Entity', 'TObject', pmNone));
+    method.Parameters.Add(TCodeParameterDeclaration.Create('Performer', 'ICommandPerformer', pmNone));
+    method.ReturnType.BaseType := 'Variant';
+
+    // One statement per line keeps the user's indentation inside the generated begin..end
+    lines := TStringList.Create;
+    try
+      lines.Text := ABody;
+      while (lines.Count > 0) and (Trim(lines[lines.Count - 1]) = '') do
+        lines.Delete(lines.Count - 1);
+      for line in lines do
+        method.Statements.Add(TCodeSnippetStatement.Create(TrimRight(line)));
+    finally
+      lines.Free;
+    end;
+  end;
+
+begin
+  // One class per unit; tables of the same unit may share it if the code is the same
+  key := LowerCase(ACodeUnit.Name + '|' + AIdInfo.GeneratorClass);
+  code := Trim(AIdInfo.GeneratorCode) + #0 + Trim(AIdInfo.RetrieveCode);
+  if FGeneratorCodes.TryGetValue(key, existingCode) then
+  begin
+    if existingCode <> code then
+      ErrorFmt('Table "%s": Id generator class "%s" is already generated in unit "%s" with a different implementation',
+        [ATable.TableName, AIdInfo.GeneratorClass, ACodeUnit.Name]);
+    Exit;
+  end;
+  if ACodeUnit.FindType(AIdInfo.GeneratorClass) <> nil then
+    ErrorFmt('Table "%s": Id generator class name "%s" conflicts with another class of unit "%s"',
+      [ATable.TableName, AIdInfo.GeneratorClass, ACodeUnit.Name]);
+  FGeneratorCodes.Add(key, code);
+
+  AddUsedUnit(ACodeUnit, 'Aurelius.Id.AbstractGenerator');
+  AddUsedUnit(ACodeUnit, 'Aurelius.Sql.Interfaces');
+  AddUsedUnit(ACodeUnit, 'Variants'); // Unassigned, Null
+
+  codeType := TCodeTypeDeclaration.Create;
+  ACodeUnit._Types.Add(codeType);
+  codeType.Name := AIdInfo.GeneratorClass;
+  codeType.BaseType.BaseType := IdGeneratorBaseClass;
+  codeType.IsClass := True;
+  codeType.Visibility := mvPublic;
+
+  // GenerateId is abstract, so it is always generated. Without a body it returns Unassigned:
+  // Aurelius then omits the Id on INSERT and calls RetrieveIdAfterInsert
+  if Trim(AIdInfo.GeneratorCode) <> '' then
+    AddMethod('GenerateId', AIdInfo.GeneratorCode)
+  else
+    AddMethod('GenerateId', 'Result := Unassigned;');
+  if Trim(AIdInfo.RetrieveCode) <> '' then
+    AddMethod('RetrieveIdAfterInsert', AIdInfo.RetrieveCode);
+end;
+
 destructor TSourceGenerator.Destroy;
 begin
 //  if FDestroyApp then
@@ -727,6 +842,7 @@ begin
   FInheritanceParentMap.Free;
   FIsInheritanceBase.Free;
   FCodeUnits.Free;
+  FGeneratorCodes.Free;
   {$IFDEF USE_SCRIPTER}
   FScripter.Free;
   {$ENDIF}
@@ -862,7 +978,16 @@ var
   Rels: TRelationshipList;
   UsedRels: TList<TGDAORelationship>;
   BestRel: TGDAORelationship;
+  mapping: TTableMapping;
 begin
+  Result.GeneratorClass := '';
+  Result.GeneratorUnit := '';
+  Result.GeneratorCode := '';
+  Result.RetrieveCode := '';
+  mapping := TableMapping(ATable);
+  if mapping.CustomId then
+    Exit(RetrieveCustomIdInfo(ATable, mapping));
+
   Result.SequenceName := '';
   Rels := TRelationshipList.Create;
   UsedRels := TList<TGDAORelationship>.Create;
@@ -965,11 +1090,118 @@ begin
       end;
     end;
     if not ATable.IsView then
-      ErrorFmt('Table "%s" has no primary key. Cannot retrieve Id', [ATable.TableName]);
+      ErrorFmt('Table "%s" has no primary key. Cannot retrieve Id. Define the Id in the export options', [ATable.TableName]);
   finally
     Rels.Free;
     UsedRels.Free;
   end;
+end;
+
+function TSourceGenerator.RetrieveCustomIdInfo(ATable: TGDAOTable;
+  AMapping: TTableMapping): TEntityIdInfo;
+var
+  fieldId: integer;
+  field: TGDAOField;
+  idFields: TList<TGDAOField>;
+  Rels: TRelationshipList;
+  UsedRels: TList<TGDAORelationship>;
+  Rel: TGDAORelationship;
+  BestRel: TGDAORelationship;
+  RelOk: boolean;
+  I: Integer;
+  RelIndex: Integer;
+  useSequence: boolean;
+begin
+  Result.SequenceName := '';
+  Result.MemberNames := [];
+  Result.GeneratorClass := '';
+  Result.GeneratorUnit := '';
+  Result.GeneratorCode := '';
+  Result.RetrieveCode := '';
+  useSequence := False;
+  if AMapping.IdFieldIds.Count = 0 then
+    ErrorFmt('Table "%s" has a custom Id without any field. Select the Id column(s) in the export options',
+      [ATable.TableName]);
+
+  idFields := TList<TGDAOField>.Create;
+  Rels := TRelationshipList.Create;
+  UsedRels := TList<TGDAORelationship>.Create;
+  try
+    for fieldId in AMapping.IdFieldIds do
+    begin
+      field := ATable.Fields.FindByID(fieldId);
+      if field = nil then
+        ErrorFmt('Table "%s": an Id field (FieldId %d) no longer exists in the model. Update the Id selection in the export options',
+          [ATable.TableName, fieldId]);
+      idFields.Add(field);
+    end;
+
+    for field in idFields do
+    begin
+      if field.IsForeignKey(Rels) then
+      begin
+        // Same rule as for primary keys: the field is mapped through the association
+        // whose child fields all belong to the Id (the one with most fields wins)
+        BestRel := nil;
+        for RelIndex := 0 to Rels.Count - 1 do
+        begin
+          Rel := Rels[RelIndex];
+          RelOk := True;
+          for I := 0 to Rel.FieldLinks.Count - 1 do
+            if idFields.IndexOf(Rel.FieldLinks[I].ChildField) = -1 then
+            begin
+              RelOk := False;
+              break;
+            end;
+          if RelOk and ((BestRel = nil) or (Rel.FieldLinks.Count > BestRel.FieldLinks.Count)) then
+            BestRel := Rel;
+        end;
+        if BestRel = nil then
+          ErrorFmt('Table "%s": Id field "%s" is a foreign key, but not all fields of its relationship are part of the Id',
+            [ATable.TableName, field.FieldName]);
+        if UsedRels.IndexOf(BestRel) = -1 then
+        begin
+          UsedRels.Add(BestRel);
+          Result.MemberNames := Result.MemberNames + ['F' + AssociationPropertyName(BestRel)];
+        end;
+      end
+      else
+        Result.MemberNames := Result.MemberNames + ['F' + PropertyName(field)];
+    end;
+    // As for primary keys, only a single non-identity field of a table uses a sequence
+    useSequence := (idFields.Count = 1) and not idFields[0].DataType.Counter and not ATable.IsView;
+  finally
+    UsedRels.Free;
+    Rels.Free;
+    idFields.Free;
+  end;
+
+  case AMapping.IdGenerator of
+    igIdentityOrSequence: Result.Generator := TIdGenerator.IdentityOrSequence;
+    igGuid: Result.Generator := TIdGenerator.Guid;
+    igUuid38: Result.Generator := TIdGenerator.Uuid38;
+    igUuid36: Result.Generator := TIdGenerator.Uuid36;
+    igUuid32: Result.Generator := TIdGenerator.Uuid32;
+    igSmartGuid: Result.Generator := TIdGenerator.SmartGuid;
+  else
+    Result.Generator := TIdGenerator.None;
+  end;
+  if Length(Result.MemberNames) > 1 then
+    Result.Generator := TIdGenerator.None
+  else
+  if AMapping.IdGenerator = igCustom then
+  begin
+    if Trim(AMapping.IdGeneratorClass) = '' then
+      ErrorFmt('Table "%s" uses a custom Id generator without a class name. Enter the generator class in the export options',
+        [ATable.TableName]);
+    Result.GeneratorClass := Trim(AMapping.IdGeneratorClass);
+    Result.GeneratorUnit := Trim(AMapping.IdGeneratorUnit);
+    Result.GeneratorCode := AMapping.IdGeneratorCode;
+    Result.RetrieveCode := AMapping.IdRetrieveCode;
+  end
+  else
+  if (Result.Generator = TIdGenerator.IdentityOrSequence) and useSequence then
+    Result.SequenceName := GetSequenceName(ATable);
 end;
 
 {$IFDEF USE_SCRIPTER}
@@ -1202,6 +1434,7 @@ begin
   try
     BuildInheritanceMap;
     FCodeUnits.Clear;
+    FGeneratorCodes.Clear;
     processedTables := TStringList.Create;
     try
       // Create main unit just to make it first in the list. This call is not necessary unless for ordering
@@ -1222,7 +1455,13 @@ begin
           function(const Left, Right: TCodeTypeDeclaration): Integer
           var
             Lev1, Lev2: integer;
+            IsGen1, IsGen2: boolean;
           begin
+            // Id generator classes first: [Id] attributes of the entities reference them
+            IsGen1 := SameText(Left.BaseType.BaseType, IdGeneratorBaseClass);
+            IsGen2 := SameText(Right.BaseType.BaseType, IdGeneratorBaseClass);
+            if IsGen1 <> IsGen2 then
+              Exit(Ord(IsGen2) - Ord(IsGen1));
             Lev1 := CodeTypeInheritanceLevel(codeUnit, Left);
             Lev2 := CodeTypeInheritanceLevel(codeUnit, Right);
             if Lev1 = Lev2 then
@@ -1808,7 +2047,10 @@ var
   modelName: string;
   tableAttr: TCodeAttributeDeclaration;
   idAttrs: TArray<TCodeAttributeDeclaration>;
+  generatorUnit: TCodeUnit;
   sequenceAttr: TCodeAttributeDeclaration;
+  tblMapping: TTableMapping;
+  entityTableName: string;
 begin
   if AProcessedTables.IndexOf(ATable.TableName) >= 0 then
     Exit;
@@ -1837,7 +2079,15 @@ begin
 
   // Create basic attributes
   AddAttribute(codeType.CustomAttributes, 'Entity');
-  tableAttr := AddAttribute(codeType.CustomAttributes, 'Table', [Format('''%s''', [ATable.TableName])]);
+  tblMapping := TableMapping(ATable);
+  entityTableName := ATable.TableName;
+  if tblMapping.CustomTable and (tblMapping.TableName <> '') then
+    entityTableName := tblMapping.TableName;
+  if tblMapping.CustomTable and (tblMapping.Schema <> '') then
+    tableAttr := AddAttribute(codeType.CustomAttributes, 'Table',
+      [Format('''%s''', [entityTableName]), Format('''%s''', [tblMapping.Schema])])
+  else
+    tableAttr := AddAttribute(codeType.CustomAttributes, 'Table', [Format('''%s''', [entityTableName])]);
 
   // Add model attributes
   for modelName in GetModelNames(ATable) do
@@ -1924,6 +2174,21 @@ begin
         ['''' + entityId.SequenceName + '''']);
 
     idAttrs := DefineIdAttribute(codeType, entityId);
+    // Custom generator: with code the class is generated, in its own unit if one is given,
+    // else in the entity unit; without code it is an existing class of GeneratorUnit
+    if (Trim(entityId.GeneratorCode) <> '') or (Trim(entityId.RetrieveCode) <> '') then
+    begin
+      if entityId.GeneratorUnit <> '' then
+        generatorUnit := FindCodeUnit(entityId.GeneratorUnit)
+      else
+        generatorUnit := ACodeUnit;
+      GenerateIdGeneratorClass(generatorUnit, ATable, entityId);
+      if generatorUnit <> ACodeUnit then
+        AddUsedUnit(ACodeUnit, generatorUnit.Name);
+    end
+    else
+    if entityId.GeneratorUnit <> '' then
+      AddUsedUnit(ACodeUnit, entityId.GeneratorUnit);
   end;
 
   // Register entity

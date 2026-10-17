@@ -94,6 +94,71 @@ begin
   end;
 end;
 
+const
+  ColumnPropNames: array[TColumnPropOption] of string = ('Required', 'NoInsert', 'NoUpdate', 'Lazy');
+  IdGeneratorNames: array[TIdGeneratorOption] of string = (
+    'None', 'IdentityOrSequence', 'Guid', 'Uuid38', 'Uuid36', 'Uuid32', 'SmartGuid', 'Custom');
+
+function ColumnPropsToStr(AProps: TColumnPropOptions): string;
+var
+  prop: TColumnPropOption;
+begin
+  Result := '';
+  for prop := Low(TColumnPropOption) to High(TColumnPropOption) do
+    if prop in AProps then
+    begin
+      if Result <> '' then
+        Result := Result + ',';
+      Result := Result + ColumnPropNames[prop];
+    end;
+end;
+
+function StrToColumnProps(ASource: string): TColumnPropOptions;
+var
+  item: string;
+  prop: TColumnPropOption;
+begin
+  Result := [];
+  for item in ASource.Split([',']) do
+    for prop := Low(TColumnPropOption) to High(TColumnPropOption) do
+      if SameText(Trim(item), ColumnPropNames[prop]) then
+        Include(Result, prop);
+end;
+
+function StrToIdGenerator(ASource: string): TIdGeneratorOption;
+var
+  gen: TIdGeneratorOption;
+begin
+  for gen := Low(TIdGeneratorOption) to High(TIdGeneratorOption) do
+    if SameText(ASource, IdGeneratorNames[gen]) then
+      Exit(gen);
+  Result := igNone;
+end;
+
+function IdFieldIdsToStr(AIds: TList<integer>): string;
+var
+  id: integer;
+begin
+  Result := '';
+  for id in AIds do
+  begin
+    if Result <> '' then
+      Result := Result + ',';
+    Result := Result + IntToStr(id);
+  end;
+end;
+
+procedure StrToIdFieldIds(ASource: string; AIds: TList<integer>);
+var
+  item: string;
+  id: integer;
+begin
+  AIds.Clear;
+  for item in ASource.Split([',']) do
+    if TryStrToInt(Trim(item), id) then
+      AIds.Add(id);
+end;
+
 { TSourceGeneratorOptionsXmlWriter }
 
 constructor TSourceGeneratorOptionsXmlWriter.Create(
@@ -293,6 +358,13 @@ begin
     newNode.Attributes['Exclude'] := 'true';
   if AMapping.PropertyType <> '' then
     newNode.Attributes['PropertyType'] := AMapping.PropertyType;
+  if AMapping.CustomColumn then
+  begin
+    newNode.Attributes['CustomColumn'] := 'true';
+    if AMapping.ColumnName <> '' then
+      newNode.Attributes['ColumnName'] := AMapping.ColumnName;
+    newNode.Attributes['ColumnProps'] := ColumnPropsToStr(AMapping.ColumnProps);
+  end;
 
   // To avoid having a too big xml file, we will remove this node if this field mapping
   // has no relevant info to be saved, in other words, if it has only default values.
@@ -329,6 +401,31 @@ begin
     newNode.Attributes['ClassUnitName'] := AMapping.ClassUnitName;
   if AMapping.SequenceName <> '' then
     newNode.Attributes['Sequence'] := AMapping.SequenceName;
+  if AMapping.CustomTable then
+  begin
+    newNode.Attributes['CustomTable'] := 'true';
+    if AMapping.TableName <> '' then
+      newNode.Attributes['TableName'] := AMapping.TableName;
+    if AMapping.Schema <> '' then
+      newNode.Attributes['Schema'] := AMapping.Schema;
+  end;
+  if AMapping.CustomId then
+  begin
+    newNode.Attributes['CustomId'] := 'true';
+    newNode.Attributes['IdFields'] := IdFieldIdsToStr(AMapping.IdFieldIds);
+    newNode.Attributes['IdGenerator'] := IdGeneratorNames[AMapping.IdGenerator];
+    if AMapping.IdGenerator = igCustom then
+    begin
+      newNode.Attributes['IdGeneratorClass'] := AMapping.IdGeneratorClass;
+      if AMapping.IdGeneratorUnit <> '' then
+        newNode.Attributes['IdGeneratorUnit'] := AMapping.IdGeneratorUnit;
+      // Multi-line code goes in a child element (attribute values lose line breaks)
+      if Trim(AMapping.IdGeneratorCode) <> '' then
+        WriteString(newNode, 'IdGeneratorCode', AMapping.IdGeneratorCode);
+      if Trim(AMapping.IdRetrieveCode) <> '' then
+        WriteString(newNode, 'IdRetrieveCode', AMapping.IdRetrieveCode);
+    end;
+  end;
 
   if AMapping.Excluded then
     newNode.Attributes['Exclude'] := 'true';
@@ -550,6 +647,12 @@ begin
   fieldMapping.PropertyName := ReadString(AContainer, 'PropertyName', '');
   fieldMapping.Excluded := ReadBoolean(AContainer, 'Exclude', False);
   fieldMapping.PropertyType := ReadString(AContainer, 'PropertyType', '');
+  fieldMapping.CustomColumn := ReadBoolean(AContainer, 'CustomColumn', False);
+  if fieldMapping.CustomColumn then
+  begin
+    fieldMapping.ColumnName := ReadString(AContainer, 'ColumnName', '');
+    fieldMapping.ColumnProps := StrToColumnProps(ReadString(AContainer, 'ColumnProps', ''));
+  end;
 end;
 
 function TSourceGeneratorOptionsXmlReader.ReadString(ANode: IXmlNode; AKey,
@@ -589,6 +692,22 @@ begin
     tableMapping.DynPropContainer := '';
   tableMapping.ModelNames := ReadString(AContainer, 'ModelNames', '');
   tableMapping.ClassUnitName := ReadString(AContainer, 'ClassUnitName', '');
+  tableMapping.CustomTable := ReadBoolean(AContainer, 'CustomTable', False);
+  if tableMapping.CustomTable then
+  begin
+    tableMapping.TableName := ReadString(AContainer, 'TableName', '');
+    tableMapping.Schema := ReadString(AContainer, 'Schema', '');
+  end;
+  tableMapping.CustomId := ReadBoolean(AContainer, 'CustomId', False);
+  if tableMapping.CustomId then
+  begin
+    StrToIdFieldIds(ReadString(AContainer, 'IdFields', ''), tableMapping.IdFieldIds);
+    tableMapping.IdGenerator := StrToIdGenerator(ReadString(AContainer, 'IdGenerator', ''));
+    tableMapping.IdGeneratorClass := ReadString(AContainer, 'IdGeneratorClass', '');
+    tableMapping.IdGeneratorUnit := ReadString(AContainer, 'IdGeneratorUnit', '');
+    tableMapping.IdGeneratorCode := ReadString(AContainer, 'IdGeneratorCode', '');
+    tableMapping.IdRetrieveCode := ReadString(AContainer, 'IdRetrieveCode', '');
+  end;
 
   tableMapping.Excluded := ReadBoolean(AContainer, 'Exclude', False);
 
