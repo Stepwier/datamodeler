@@ -106,7 +106,8 @@ begin
   if FDatabase > '' then
     result := Format('UPPER(%s)=%s', [AField, QuotedStr(AnsiUpperCase(FDatabase))])
   else
-    result := '0=0';
+    // no DATABASE parameter: the connection's current database, not every schema of the server
+    result := Format('%s = DATABASE()', [AField]);
   {$ENDIF}
 end;
 
