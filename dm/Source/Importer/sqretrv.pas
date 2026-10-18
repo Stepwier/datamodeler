@@ -16,9 +16,16 @@ type
     _IncrementValue : Integer;
   end;
 
+  TFieldDefinitionFunc = function(ADatatype: String; ASize, APrecision, AScale: Integer): TFieldDefinitionRec of object;
+
   TSqlServerDataRetriever = class(TDataRetriever)
   protected
     function CheckSqlServerVersion(AVersion: integer; AEdition: string=''): boolean;
+
+    {Creates a view-backed table (IsView=True) for each view of the views category,
+    with the view columns (name, data type, size, nullability). Must run after the
+    views were retrieved}
+    procedure GetViewTables(ADictionary: TGDAODatabase; AGetFieldDefinition: TFieldDefinitionFunc);
   end;
 
   TSqlServer2000DataRetriever = class(TSqlServerDataRetriever)
@@ -550,6 +557,7 @@ var
         AView.CreateImplementation := Trim(Module.FieldAsString('VIEW_DEFINITION'));
         Module.Next;
       end;
+      GetViewTables(ADictionary, GetFieldDefinition);
     end;
   end;
 
@@ -1215,6 +1223,7 @@ var
         AView.CreateImplementation := Module.FieldAsString('VIEW_DEFINITION');
         Module.Next;
       end;
+      GetViewTables(ADictionary, GetFieldDefinition);
     end;
   end;
 
@@ -1422,6 +1431,67 @@ begin
 end;
 
 { TSqlServerDataRetriever }
+
+procedure TSqlServerDataRetriever.GetViewTables(ADictionary: TGDAODatabase;
+  AGetFieldDefinition: TFieldDefinitionFunc);
+var
+  category: TGDAOCategory;
+  ATable: TGDAOTable;
+  newField: TGDAOField;
+  i: integer;
+begin
+  category := ADictionary.Categories.FindByType(ctView);
+  if category = nil then
+    Exit;
+
+  for i := 0 to category.Objects.Count - 1 do
+    if ADictionary.TableByName(category.Objects[i].ObjectName) = nil then
+      ADictionary.Tables.Add(category.Objects[i].ObjectName).IsView := true;
+
+  Module.Open(
+    'select v.name as TABLE_NAME, '#13#10+
+    'c.name as COLUMN_NAME, '#13#10+
+    'd.name as DATA_TYPE, '#13#10+
+    'd.is_user_defined as IS_DOMAIN, '#13#10+
+    'c.max_length as CHAR_LENGTH, '#13#10+
+    'convert(int,OdbcPrec(c.system_type_id,c.max_length,c.precision)) as NUMERIC_PRECISION, '#13#10+
+    'c.scale as NUMERIC_SCALE, '#13#10+
+    'c.is_nullable as IS_NULLABLE '#13#10+
+    'from sys.columns c '#13#10+
+    'inner join sys.views v on c.object_id = v.object_id '#13#10+
+    'inner join sys.types d on c.user_type_id = d.user_type_id '#13#10+
+    'order by v.name, c.column_id');
+  ATable := nil;
+  while not Module.EOF do
+  begin
+    if (ATable = nil) or
+      not SameText(ATable.TableName, Module.FieldAsString('TABLE_NAME')) then
+      ATable := ADictionary.TableByName(Module.FieldAsString('TABLE_NAME'));
+
+    if (ATable <> nil) and ATable.IsView then
+    begin
+      newField := ATable.Fields.Add(
+        Module.FieldAsString('COLUMN_NAME'), nil, 0, 0,
+        not Module.FieldAsBoolean('IS_NULLABLE'));
+
+      if Module.FieldAsBoolean('IS_DOMAIN') and
+        (ADictionary.Domains.FindByName(Module.FieldAsString('DATA_TYPE')) <> nil) then
+        newField.DomainName := Module.FieldAsString('DATA_TYPE')
+      else
+        with AGetFieldDefinition(
+          Module.FieldAsString('DATA_TYPE'),
+          Module.FieldAsInteger('CHAR_LENGTH'),
+          Module.FieldAsInteger('NUMERIC_PRECISION'),
+          Module.FieldAsInteger('NUMERIC_SCALE')) do
+        begin
+          newField.DataTypeName := _DataTypeName;
+          newField.Size         := _Size;
+          newField.Size2        := _Precision;
+        end;
+    end;
+    Module.Next;
+  end;
+end;
 
 function TSqlServerDataRetriever.CheckSqlServerVersion(AVersion: integer; AEdition: string): boolean;
 var

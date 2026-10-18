@@ -482,6 +482,7 @@ var
   readonly: boolean;
   selNode: TTreeNode;
   selObj: TObject;
+  viewTable: TGDAOTable;
 begin
   if (FocusedTreeView <> nil) and (FocusedTreeView.Selected <> nil) then
   begin
@@ -518,8 +519,12 @@ begin
         begin
           CloseElement(TGDAOObject(AObj));
           category := TGDAOObject(AObj).OwnerCategory;
+          {A view also owns a hidden view-backed table with its columns: delete it too}
+          viewTable := FMetaData.DataDictionary.ViewTable(TGDAOObject(AObj));
           RemoveNodeReference(AObj);
           TGDAOObject(AObj).Free;
+          if viewTable <> nil then
+            DeleteTable(viewTable);
           AddObjectsToTreeView(category, selObj);
           SetModified(nil);
         end

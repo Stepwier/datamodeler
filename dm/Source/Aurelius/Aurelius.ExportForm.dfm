@@ -902,6 +902,23 @@ object fmAureliusExport: TfmAureliusExport
         ParentShowHint = False
         ShowHint = True
       end
+      object lbLegendItalic: TLabel
+        Left = 125
+        Top = 483
+        Width = 63
+        Height = 13
+        Hint = 'Entity generated from a database view'
+        Anchors = [akLeft, akBottom]
+        Caption = 'Italic = view'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGrayText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsItalic]
+        ParentFont = False
+        ParentShowHint = False
+        ShowHint = True
+      end
       object grTables: TAdvColumnGrid
         Left = 3
         Top = 27

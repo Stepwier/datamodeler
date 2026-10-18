@@ -2342,7 +2342,9 @@ begin
     domain.Information := Self.Domain.Information;
 end;
 
-{ ApplyDBAction - extra objects (views, procedures, sequences, functions) }
+{ ApplyDBAction - extra objects (views, procedures, sequences, functions)
+  The column structure of a view lives in its view-backed table (IsView=True),
+  which is created/changed by the table and field actions }
 
 function FindDictionaryObject(ADictionary: TGDAODatabase; AObject: TGDAOObject): TGDAOObject;
 var
@@ -2385,11 +2387,17 @@ end;
 procedure TatRemoveExtraObjectAction.ApplyDBAction(ADictionary: TGDAODatabase);
 var
   extraObject: TGDAOObject;
+  viewTable: TGDAOTable;
 begin
   inherited;
   extraObject := FindDictionaryObject(ADictionary, Self.ExtraObject);
-  if extraObject <> nil then
-    extraObject.Free;
+  if extraObject = nil then
+    Exit;
+  // a dropped view also drops its view-backed table
+  viewTable := ADictionary.ViewTable(extraObject);
+  extraObject.Free;
+  if viewTable <> nil then
+    RemoveDictionaryTable(ADictionary, viewTable);
 end;
 
 { Action scope helpers }

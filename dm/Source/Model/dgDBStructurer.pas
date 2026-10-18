@@ -150,6 +150,7 @@ type
     FItems: TSQLScriptFilterItems;
     FExcludedTables: TStrings;
     FCategories: TGDAOCategoryTypes;
+    FIncludeViewTables: boolean;
     FResyncMode: boolean;
 
     {IsTableIncluded is different than MustInclude(Table). This function
@@ -173,9 +174,16 @@ type
     function MustIncludeConstraint(AField: TGDAOField): boolean;
     function MustIncludeComments: boolean;
 
+    {Returns false for view-backed tables (IsView=True) unless IncludeViewTables is set.
+    Used by the comparer to ignore view-backed tables on both sides}
+    function MustCompareTable(ATable: TGDAOTable): boolean;
+
     property Items: TSQLScriptFilterItems read FItems write FItems;
     property Categories: TGDAOCategoryTypes read FCategories write FCategories;
     property ExcludedTables: TStrings read FExcludedTables;
+    {Default false: Update Database / Generate Script never see view-backed tables.
+    Resync sets it to true so view columns are compared}
+    property IncludeViewTables: boolean read FIncludeViewTables write FIncludeViewTables;
     {Resync (model <- live database): tolerate what retrievers do not read back exactly.
     Comments missing on the database side are ignored, primary keys compare by fields
     (not by system-generated names), type names and object source text compare loosely}
@@ -462,6 +470,7 @@ begin
   begin
     FItems := TSQLScriptFilter(ASource).FItems;
     FCategories := TSQLScriptFilter(ASource).FCategories;
+    FIncludeViewTables := TSQLScriptFilter(ASource).FIncludeViewTables;
     FResyncMode := TSQLScriptFilter(ASource).FResyncMode;
     FExcludedTables.Assign(TSQLScriptFilter(ASource).FExcludedTables);
   end else
@@ -483,7 +492,12 @@ end;
 
 function TSQLScriptFilter.IsTableIncluded(ATable: TGDAOTable): boolean;
 begin
-  result := (ATable <> nil) and (FExcludedTables.IndexOf(ATable.TableName) < 0);
+  result := MustCompareTable(ATable) and (FExcludedTables.IndexOf(ATable.TableName) < 0);
+end;
+
+function TSQLScriptFilter.MustCompareTable(ATable: TGDAOTable): boolean;
+begin
+  result := (ATable <> nil) and (FIncludeViewTables or not ATable.IsView);
 end;
 
 function TSQLScriptFilter.MustInclude(AIndex: TGDAOIndex): boolean;

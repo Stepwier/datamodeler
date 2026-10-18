@@ -722,8 +722,8 @@ begin
   Result := [];
   if AField.Required then
     Include(Result, cpRequired);
-  // Counter fields and computed fields are read-only
-  if AField.DataType.Counter or AField.DataType.Computed then
+  // Counter fields, computed fields and view columns are read-only
+  if AField.DataType.Counter or AField.DataType.Computed or AField.OwnerTable.IsView then
     Result := Result + [cpNoInsert, cpNoUpdate];
   if IsBlob(PropertyType(AField)) then
     Include(Result, cpLazy);
@@ -987,6 +987,8 @@ begin
   mapping := TableMapping(ATable);
   if mapping.CustomId then
     Exit(RetrieveCustomIdInfo(ATable, mapping));
+  if ATable.IsView then
+    ErrorFmt('View "%s" has no Id defined. Select the Id column(s) of the view in the export options', [ATable.TableName]);
 
   Result.SequenceName := '';
   Rels := TRelationshipList.Create;
@@ -1089,8 +1091,7 @@ begin
         end;
       end;
     end;
-    if not ATable.IsView then
-      ErrorFmt('Table "%s" has no primary key. Cannot retrieve Id. Define the Id in the export options', [ATable.TableName]);
+    ErrorFmt('Table "%s" has no primary key. Cannot retrieve Id. Define the Id in the export options', [ATable.TableName]);
   finally
     Rels.Free;
     UsedRels.Free;
@@ -2545,7 +2546,12 @@ begin
     Exit(nil);
 
   if not FOptions.Tables.ContainsKey(ATable.TID) then
-    FOptions.Tables.Add(ATable.TID, TTableMapping.Create);
+  begin
+    Result := TTableMapping.Create;
+    // Views need an explicit Id choice, so they are not exported until the user selects them
+    Result.Excluded := ATable.IsView;
+    FOptions.Tables.Add(ATable.TID, Result);
+  end;
   Result := FOptions.Tables[ATable.TID];
 end;
 

@@ -24,6 +24,7 @@ type
     cbTablesFilter: TComboBox;
     edTablesFilter: TEdit;
     lbLegendBold: TLabel;
+    lbLegendItalic: TLabel;
     pnMappingsLeft: TPanel;
     splMappings: TSplitter;
     pnMappingsRight: TPanel;
@@ -233,6 +234,7 @@ type
     procedure UpdateIdGeneratorClassEnabled;
     function CheckedIdFieldCount: Integer;
     function MatchesFilter(ACombo: TComboBox; AEdit: TEdit; const AName: string; AIncluded: Boolean): Boolean;
+    function TableDisplayName(ATable: TGDAOTable): string;
     procedure ClearTablesFilter;
     procedure SetVisibleTablesIncluded(AIncluded: Boolean);
     procedure SetVisibleFieldsIncluded(AIncluded: Boolean);
@@ -1357,8 +1359,9 @@ begin
     for c := 0 to FApp.DataDictionary.Tables.Count - 1 do
     begin
       table := FApp.DataDictionary.Tables[c];
+      // TableMapping (not FOptions.Tables) so views get their default "excluded" state
       mapping := FGenerator.TableMapping(table);
-      if MatchesFilter(cbTablesFilter, edTablesFilter, table.TableName, not mapping.Excluded) then
+      if MatchesFilter(cbTablesFilter, edTablesFilter, TableDisplayName(table), not mapping.Excluded) then
         visible.Add(table);
     end;
 
@@ -1372,7 +1375,7 @@ begin
       grTables.Objects[0, row] := table;
       // field properties
       grTables.SetCheckBoxState(0, row, not FGenerator.TableMapping(table).Excluded);
-      grTables.Cells[1, row] := table.TableName;
+      grTables.Cells[1, row] := TableDisplayName(table);
     end;
     grTables.Options := grTables.Options + [goRowSelect];
     grTables.Sort(0);
@@ -1387,6 +1390,14 @@ begin
     visible.Free;
   end;
   grTablesClick(nil);
+end;
+
+function TfmAureliusExport.TableDisplayName(ATable: TGDAOTable): string;
+begin
+  if ATable.IsView then
+    Result := ATable.TableName + ' (view)'
+  else
+    Result := ATable.TableName;
 end;
 
 function TfmAureliusExport.MatchesFilter(ACombo: TComboBox; AEdit: TEdit; const AName: string;
@@ -1469,10 +1480,12 @@ begin
         end;
   end;
 
-  // Bold = Aurelius attribute override
+  // Bold = Aurelius attribute override; italic = view
   styles := [];
   if overridden then
     Include(styles, fsBold);
+  if table.IsView then
+    Include(styles, fsItalic);
   grTables.FontStyles[1, ARow] := styles;
 end;
 
